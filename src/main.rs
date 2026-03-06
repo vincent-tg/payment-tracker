@@ -89,7 +89,16 @@ enum Commands {
     
     /// Initialize the database
     Init,
-}
+    
+    /// Start web server with health endpoints
+    Serve {
+        /// Port to listen on
+        #[arg(short, long, default_value_t = 8080)]
+        port: u16,
+    },
+    
+    /// Run daily VIB bank tracking
+    Daily,
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -165,8 +174,25 @@ async fn main() -> Result<()> {
         
         Commands::Init => {
             let config = Config::load()?;
-            db::Database::init_database(&config.database.path).await?;
+            db::Database::init_database(&config.database.get_connection_string()).await?;
             println!("Database initialized successfully!");
+        }
+        
+        Commands::Serve { port } => {
+            println!("🚀 Starting VIB Payment Tracker web server on port {}", port);
+            println!("   Health endpoint: http://0.0.0.0:{}/health", port);
+            payment_tracker::web::start_health_server(port).await?;
+        }
+        
+        Commands::Daily => {
+            println!("📅 Running daily VIB bank tracking...");
+            let config = Config::load()?;
+            let app = App::new(config).await?;
+            
+            // This would run the daily tracking logic
+            // For now, just fetch and process emails
+            app.fetch_and_process_emails().await?;
+            println!("✅ Daily tracking completed!");
         }
     }
     

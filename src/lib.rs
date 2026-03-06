@@ -3,6 +3,7 @@ pub mod currency;
 pub mod db;
 pub mod email;
 pub mod models;
+pub mod web;
 pub mod transactions;
 
 use anyhow::Result;

@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-tracker-config
+data:
+  config.toml: |
+    [email]
+    address = "baotg.fin@gmail.com"
+    password = "tfme vicd wwkx iafg"
+    imap_server = "imap.gmail.com"
+    imap_port = 993
+
+    [database]
+    path = "payments.db"
+    connection_string = "postgres://payment_user:payment_password@postgres:5432/payment_tracker"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payment-tracker-secrets
+type: Opaque
+stringData:
+  email-password: "tfme vicd wwkx iafg"
+  postgres-password: "payment_password"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-tracker
+  labels:
+    app: payment-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-tracker
+  template:
+    metadata:
+      labels:
+        app: payment-tracker
+    spec:
+      containers:
+      - name: payment-tracker
+        image: vincenttg/payment-tracker:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: RUST_LOG
+          value: "info"
+        - name: DATABASE_URL
+          value: "postgres://payment_user:$(POSTGRES_PASSWORD)@postgres:5432/payment_tracker"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: payment-tracker-secrets
+              key: postgres-password
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config.toml
+          subPath: config.toml
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config-volume
+        configMap:
+          name: payment-tracker-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-tracker
+spec:
+  selector:
+    app: payment-tracker
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: payment-tracker-daily
+spec:
+  schedule: "0 8 * * *"  # Run daily at 8 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: payment-tracker-daily
+            image: vincenttg/payment-tracker:latest
+            imagePullPolicy: Always
+            command: ["/app/docker-entrypoint.sh"]
+            args: ["daily"]
+            env:
+            - name: DATABASE_URL
+              value: "postgres://payment_user:$(POSTGRES_PASSWORD)@postgres:5432/payment_tracker"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: payment-tracker-secrets
+                  key: postgres-password
+            volumeMounts:
+            - name: config-volume
+              mountPath: /app/config.toml
+              subPath: config.toml
+          restartPolicy: OnFailure
+          volumes:
+          - name: config-volume
+            configMap:
+              name: payment-tracker-config
