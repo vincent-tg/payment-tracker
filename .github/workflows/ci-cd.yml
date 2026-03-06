@@ -14,7 +14,7 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, k3s, linux, arm64]
     steps:
     - uses: actions/checkout@v4
     
@@ -50,7 +50,7 @@ jobs:
 
   build-and-push:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, k3s, linux, arm64]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     permissions:
@@ -87,22 +87,22 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        platforms: linux/arm64
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
   deploy-to-k3s:
     needs: build-and-push
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, k3s, linux, arm64]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Configure k3s kubectl
+    - name: Verify k3s kubectl access
       run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.K3S_KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-        chmod 600 $HOME/.kube/config
+        kubectl get nodes
+        kubectl cluster-info
     
     - name: Deploy to k3s
       run: |
@@ -125,17 +125,16 @@ jobs:
         kubectl get cronjobs -n default
 
   daily-track:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, k3s, linux, arm64]
     if: github.event_name == 'schedule'
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Configure k3s kubectl
+    - name: Verify k3s kubectl access
       run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.K3S_KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-        chmod 600 $HOME/.kube/config
+        kubectl get nodes
+        kubectl cluster-info
     
     - name: Trigger daily tracking job
       run: |
