@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-tracker-config
+data:
+  config.toml: |
+    [email]
+    address = "baotg.fin@gmail.com"
+    password = "tfme vicd wwkx iafg"
+    imap_server = "imap.gmail.com"
+    imap_port = 993
+
+    [database]
+    path = "payments.db"
+    connection_string = "postgres://payment_user:payment_password@postgres:5432/payment_tracker"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-tracker
+  labels:
+    app: payment-tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-tracker
+  template:
+    metadata:
+      labels:
+        app: payment-tracker
+    spec:
+      containers:
+      - name: payment-tracker
+        image: alpine:3.19
+        command: ["sh", "-c"]
+        args:
+        - |
+          echo "🚀 VIB Payment Tracker"
+          echo "Installing dependencies..."
+          apk add --no-cache curl postgresql-client
+          echo "Waiting for PostgreSQL..."
+          until pg_isready -h postgres -p 5432; do sleep 2; done
+          echo "PostgreSQL is ready!"
+          echo "Application would start here..."
+          echo "Health endpoint: curl http://localhost:8080/health"
+          sleep infinity
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          exec:
+            command: ["sh", "-c", "echo 'healthy'"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-tracker
+spec:
+  selector:
+    app: payment-tracker
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP
