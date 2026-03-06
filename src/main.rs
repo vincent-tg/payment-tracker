@@ -49,7 +49,7 @@ enum Commands {
         from: Option<String>,
         
         /// Filter by date range (format: YYYY-MM-DD)
-        #[arg(short, long)]
+        #[arg(short = 'T', long)]
         to: Option<String>,
         
         /// Limit number of results
@@ -83,7 +83,7 @@ enum Commands {
         r#type: String,
         
         /// Transaction date (format: YYYY-MM-DD, defaults to today)
-        #[arg(short, long)]
+        #[arg(short = 'D', long)]
         date: Option<String>,
     },
     

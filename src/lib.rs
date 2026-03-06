@@ -1,4 +1,5 @@
 pub mod config;
+pub mod currency;
 pub mod db;
 pub mod email;
 pub mod models;
@@ -18,7 +19,7 @@ pub struct App {
 
 impl App {
     pub async fn new(config: Config) -> Result<Self> {
-        let db = Database::new(&config.database.path).await?;
+        let db = Database::new(&config.database.get_connection_string()).await?;
         Ok(Self { config, db })
     }
     
@@ -37,23 +38,43 @@ impl App {
         
         println!("Found {} new emails", emails.len());
         
-        for email in emails {
-            if let Some(transaction) = email::parse_transaction_from_email(&email) {
-                println!("Parsed transaction: {:?}", transaction);
+        let mut parsed_count = 0;
+        let mut saved_count = 0;
+        
+        for (i, email) in emails.iter().enumerate() {
+            if let Some(transaction) = email::parse_transaction_from_email(email) {
+                parsed_count += 1;
+                println!("[Email {}] Parsed transaction: {} - ${:.2} ({})", 
+                    i + 1, transaction.description, transaction.amount, transaction.r#type);
                 
                 // Check if transaction already exists
                 let exists = self.db.transaction_exists(&transaction).await?;
                 
                 if !exists {
                     self.db.insert_transaction(&transaction).await?;
-                    println!("Saved transaction: {} - {}", transaction.description, transaction.amount);
+                    saved_count += 1;
+                    println!("  -> Saved to database");
                 } else {
-                    println!("Transaction already exists, skipping");
+                    println!("  -> Already exists in database, skipping");
+                }
+            } else {
+                // Debug: Print first 200 chars of emails that weren't parsed
+                if i < 5 {  // Only show first 5 non-parsed emails for debugging
+                    let preview = if email.len() > 200 {
+                        &email[..200]
+                    } else {
+                        email
+                    };
+                    println!("[Email {}] Could not parse transaction from email (preview):\n{}...", 
+                        i + 1, preview.replace("\n", " "));
                 }
             }
         }
         
-        println!("Email processing completed!");
+        println!("\nEmail processing completed!");
+        println!("  Total emails: {}", emails.len());
+        println!("  Parsed transactions: {}", parsed_count);
+        println!("  Saved transactions: {}", saved_count);
         Ok(())
     }
     

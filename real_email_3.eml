@@ -1,0 +1,523 @@
+Delivered-To: baotg.fin@gmail.com
+Received: by 2002:a05:651c:b08:b0:389:ecc3:6b8a with SMTP id b8csp1728836ljr;
+        Mon, 2 Mar 2026 20:51:33 -0800 (PST)
+X-Forwarded-Encrypted: i=4; AJvYcCU9ymNtp7SXKnEACYN8zikbnXKo3aaF+j+4nF2j13rx7GVqMWqFMMkaBD8kP75kXJJZJmS1Q9gC0PA=@gmail.com
+X-Received: by 2002:ac8:7dd2:0:b0:4ff:89ff:6608 with SMTP id d75a77b69052e-508ce9a38c7mr9923171cf.5.1772513493607;
+        Mon, 02 Mar 2026 20:51:33 -0800 (PST)
+ARC-Seal: i=3; a=rsa-sha256; t=1772513493; cv=pass;
+        d=google.com; s=arc-20240605;
+        b=hFUUlakPV291oOKeqv0Vizjgx+cJe0SCSALQKI/oJxbSoIh7SIFhjwK7zE+jxSvSGz
+         sJ3MVEB1U5JXlJtzZXUDaoj/y1GoFcnABvYN7N3B5e1oNzKAZmA7M4poCfCi/7o5a5so
+         6tgMlUoRN0PJbPOZ2qxmQoO5RIw6wLWgF+45R7aTckDsva+dI9Fnq4n6uXWLvGsVB8bU
+         KgyuVc8tCOXWh5TQ3asvyA+eLnqPWXebSTqySt9l234O05QsEracYkdfZwi5Wl6PW3gP
+         FtkHi0HUeWsEqlKcNPhKQedEucX7t++Igc42hEzHoJPtuVdBPK2RnDxO+VSHwOR2GUkV
+         u9GQ==
+ARC-Message-Signature: i=3; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=feedback-id:mime-version:subject:message-id:to:from:date
+         :dkim-signature:dkim-signature:delivered-to;
+        bh=SkJh/A1GosdbdRg3HG+Ops6w2Js0VDHnuADYjyc46Qk=;
+        fh=racxIRW7fsAhR8GlQYTsP8ngu1ZnaemhEoCmqkpT5ow=;
+        b=Q12MmxEqfYChsEeOdntvKSevaxigKi5ZWcQlum9G5rcBdmVoYuZmJ7G2Vci5q/fSDS
+         KfQjFhkuU0QME3t93wFmYpPLWb22UJu+avauvMKgfjZy20eEm8+4Gr1I4iCBzdkMyUB6
+         o6sYjUpoIm4Nx49YUf1i9Qtppewb1AX8ySpMtrH52y+LIalXch3i6mvJaH1+RdfaSuvm
+         EHFSlJC7YTVrQ8c4OcoGW2bRDdzO0uyvmIxPj0AcR7LClq5XBQXtTEkFbhdFnYYL1BTH
+         Q186gmV77DUk7M8PJD5AC3GMPxy1f4zfpdHJu0FKvRvNYhKuV06NQax97Q6U09BCwQnB
+         G2eA==;
+        dara=google.com
+ARC-Authentication-Results: i=3; mx.google.com;
+       dkim=pass header.i=@card.vib.com.vn header.s=ogpodlam3jwjm4h26kavay65qjc5o352 header.b=oE+QcR1m;
+       dkim=pass header.i=@amazonses.com header.s=pd64dbxfdcqqbvadj6zks7h7qe3c33ao header.b=JytEEAOC;
+       arc=pass (i=2 spf=pass spfdomain=ap-southeast-1.amazonses.com dkim=pass dkdomain=card.vib.com.vn dkim=pass dkdomain=amazonses.com dmarc=pass fromdomain=vib.com.vn);
+       spf=pass (google.com: domain of baotg.it+caf_=baotg.fin=gmail.com@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom="baotg.it+caf_=baotg.fin=gmail.com@gmail.com";
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=vib.com.vn;
+       dara=pass header.i=@gmail.com
+Return-Path: <baotg.it+caf_=baotg.fin=gmail.com@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id d75a77b69052e-50736059b9csor84710481cf.0.2026.03.02.20.51.33
+        for <baotg.fin@gmail.com>
+        (Google Transport Security);
+        Mon, 02 Mar 2026 20:51:33 -0800 (PST)
+Received-SPF: pass (google.com: domain of baotg.it+caf_=baotg.fin=gmail.com@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@card.vib.com.vn header.s=ogpodlam3jwjm4h26kavay65qjc5o352 header.b=oE+QcR1m;
+       dkim=pass header.i=@amazonses.com header.s=pd64dbxfdcqqbvadj6zks7h7qe3c33ao header.b=JytEEAOC;
+       arc=pass (i=2 spf=pass spfdomain=ap-southeast-1.amazonses.com dkim=pass dkdomain=card.vib.com.vn dkim=pass dkdomain=amazonses.com dmarc=pass fromdomain=vib.com.vn);
+       spf=pass (google.com: domain of baotg.it+caf_=baotg.fin=gmail.com@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom="baotg.it+caf_=baotg.fin=gmail.com@gmail.com";
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=vib.com.vn;
+       dara=pass header.i=@gmail.com
+ARC-Seal: i=2; a=rsa-sha256; t=1772513493; cv=pass;
+        d=google.com; s=arc-20240605;
+        b=HQkIgTwnyjm/e8uFYkU0xV9E5p29Oaisi3IZuls+/XZByipg0wLh/w7lrNYSjBybR0
+         QFjGt9VoeXe0Hs6E1+I3W3npSbgv9q5xgkdNr0Me0S2XVm/nDZ41bq+87BWqtabZEOYO
+         WdTtdTQ4sIbRPQ1/RIYqZ54EAkboOk3zOfA2z0gWqiHsbgmYNIFMA2WgF1e2LOpJkMYD
+         dKGlYwEd4c3S/V+NKiCksh7/Hp0F6w6ZajmqLpZFZD6MR7ZK/hP6Ivc94O55yjuz46V4
+         h+BbONhvXycnENaqU4DcbRdgHP5S+95leeLuQN0TeHg1DfytAsWjdrNB42lyRuplp0vC
+         6Qwg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=feedback-id:mime-version:subject:message-id:to:from:date
+         :dkim-signature:dkim-signature:delivered-to;
+        bh=SkJh/A1GosdbdRg3HG+Ops6w2Js0VDHnuADYjyc46Qk=;
+        fh=racxIRW7fsAhR8GlQYTsP8ngu1ZnaemhEoCmqkpT5ow=;
+        b=TFB938Gw9O2mtIK13BLZiJyKLeHNMY7BaAtMMlF9BAWEtnAu/+lq6qhNSSA8Vrhygk
+         WzWv8gypS7Wp8qvjIxNPWpNBTUFfuEr0rJPGt7rPQwaFBbTRa1gJnm6UhxmTCsNHLqlr
+         RznE/8LBk2ISYOV/mzOz8BZxfpcCWeAMufZNPcx+QSVbGBQBEQcEbSiXux2PjnqtMqfJ
+         4vWJPUUNzTnXOW9pOSX2MllB2pkJ7v3rICN/RU9c9z6WmPC1tPSc103lfohFTFA10j7M
+         VsAY97kZZ0aOLjG5ZukCxi+qfbWMK68COdZtKvm0enXsEAL+r+3ONgolvrSgaTzLFbL+
+         rP/A==;
+        dara=google.com
+ARC-Authentication-Results: i=2; mx.google.com;
+       dkim=pass header.i=@card.vib.com.vn header.s=ogpodlam3jwjm4h26kavay65qjc5o352 header.b=oE+QcR1m;
+       dkim=pass header.i=@amazonses.com header.s=pd64dbxfdcqqbvadj6zks7h7qe3c33ao header.b=JytEEAOC;
+       spf=pass (google.com: domain of 010e019cb20971e1-10eaf00f-46d6-4af5-9523-383f41e0d765-000000@ap-southeast-1.amazonses.com designates 23.251.232.50 as permitted sender) smtp.mailfrom=010e019cb20971e1-10eaf00f-46d6-4af5-9523-383f41e0d765-000000@ap-southeast-1.amazonses.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=vib.com.vn
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772513493; x=1773118293;
+        h=feedback-id:mime-version:subject:message-id:to:from:date
+         :dkim-signature:dkim-signature:delivered-to:x-forwarded-for
+         :x-forwarded-to:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SkJh/A1GosdbdRg3HG+Ops6w2Js0VDHnuADYjyc46Qk=;
+        b=AYDx8HOgp9+EAwUilf/aVHzbrefavnXUwenYNor4Ttl/i1139+EgPPFyX2HapIyRi5
+         PLKcg+FhE1dnwVkWnB37tExI/0T+hyP9HI7HJOE560aF+iJ+C9GzmdyAZ03qnEf5ugG3
+         Yw67POj1YSdSmKE4z4f/KhirSaEFI7VK7JHCeZpX56jSyTZDDWlxUWpAoZwC0/3YwGGN
+         AeCAYAbdtXDAuVKJmQlBZcpf/XQvwZ+dtYO09w4HLWZKR/uRtuZAEYbm31X8XjIo6vkm
+         1snwrd1WMqUyr6HsC3h9Kx3fNYScaQspbP383DshGxobnGiR3aM/b9Ee8IOUzOUZhqtb
+         MO6A==
+X-Forwarded-Encrypted: i=2; AJvYcCUGFJ8+GekrF4pUAvNkH/OYIvmxk/ObvpgY1ZYlS4hMJRXlIg3XzUXRSTxapLvYxQU8/1l1aSfyLtI=@gmail.com
+X-Gm-Message-State: AOJu0YwYaa1eePBVAEDIRmaoFqBY0SYNlkVlsELrBvfqQ/CDmIZrUMKt
+	7y//gDvquDrfv16o59+6R8d9joc1vhxAtZ+q5ThqmG/MH0GRnwwpaM8aR/FEjq2syZ25wyDLUFS
+	8HX7IuXlcMErY4r/hgvxju8bHYqTeR16GuwyQjQGulKnTvqIsJ8fNW/CnphJ6IQ==
+X-Received: by 2002:ac8:7414:0:b0:502:a1a3:735b with SMTP id d75a77b69052e-508ce467875mr6754781cf.0.1772513493037;
+        Mon, 02 Mar 2026 20:51:33 -0800 (PST)
+X-Forwarded-To: baotg.fin@gmail.com
+X-Forwarded-For: baotg.it@gmail.com baotg.fin@gmail.com
+Delivered-To: baotg.it@gmail.com
+Received: by 2002:a05:622a:5b88:b0:506:ef1e:6c6 with SMTP id ec8csp2149953qtb;
+        Mon, 2 Mar 2026 20:51:30 -0800 (PST)
+X-Received: by 2002:a05:6a21:6e82:b0:263:616e:b61d with SMTP id adf61e73a8af0-398144a3efdmr784056637.23.1772513490325;
+        Mon, 02 Mar 2026 20:51:30 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772513490; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JFmo1Y9STIbF93YrwswgZVyX+t4C465xWVxS6VRm6mYDZr7o9GRiAJ7dIqFydjG+Xe
+         z+Peb+hMJjacpNjzJeYfKGUIiqyvrgzioK8UrtOIVl37cVNQBSDJSdoQqmholLU1J57W
+         kB+sGU8g8fAUiuTaM3wpllqLL4W2EtdOSDT+mOP+UkICU+cOKZC8ZVol+/mO6OpELAwR
+         RUNQ844ChGVYHss/ZSLwW/CjUGKhPoKeJCMBsl60Kgvs0XxPiSN5oEdCkkQqCo9U1Ddq
+         4ejXOw8mtrJCGY+3HxAmsEFK1MS0mLwOo10DJOIbZ22PNXZG5AYpVM+vFKp+VMBSbY18
+         +jyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=feedback-id:mime-version:subject:message-id:to:from:date
+         :dkim-signature:dkim-signature;
+        bh=SkJh/A1GosdbdRg3HG+Ops6w2Js0VDHnuADYjyc46Qk=;
+        fh=ORZE+sax3xeQzaHqV9wuyi7FhoNZb5MMhWA2KYykPXg=;
+        b=LaIV1p9084FEugakX7Jq1Qi84yWNzWNdbXscUGcWu4G9X+uvi/wBuakeD3zihvPkOq
+         4t0iQ8mTBz3TE4oqnnGpSsM+h2GmaMh95ClZEYWNgacL7opGXwbP/C+3wUL+wN13pfmE
+         9ja6b9dFdRGsD1O16xuyoAFTGaOixxNONnFDq5IKg+nY3wQhB8NNwmQoriKKIOELtGy5
+         PJaa/aZwxobenVgyowBGNfL6AYwJUnkMvVb4OZCqYXJuzKdJ3/RCTukwaeq7qtInHsWa
+         FnD7LqwmKAGvWWhYjlk9UXGAX3LbGawSbK+xWzr3eoguSRIx8Um+KTmhRr7fTc/0xOk7
+         XhsQ==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@card.vib.com.vn header.s=ogpodlam3jwjm4h26kavay65qjc5o352 header.b=oE+QcR1m;
+       dkim=pass header.i=@amazonses.com header.s=pd64dbxfdcqqbvadj6zks7h7qe3c33ao header.b=JytEEAOC;
+       spf=pass (google.com: domain of 010e019cb20971e1-10eaf00f-46d6-4af5-9523-383f41e0d765-000000@ap-southeast-1.amazonses.com designates 23.251.232.50 as permitted sender) smtp.mailfrom=010e019cb20971e1-10eaf00f-46d6-4af5-9523-383f41e0d765-000000@ap-southeast-1.amazonses.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=vib.com.vn
+Return-Path: <010e019cb20971e1-10eaf00f-46d6-4af5-9523-383f41e0d765-000000@ap-southeast-1.amazonses.com>
+Received: from e232-50.smtp-out.ap-southeast-1.amazonses.com (e232-50.smtp-out.ap-southeast-1.amazonses.com. [23.251.232.50])
+        by mx.google.com with ESMTPS id 41be03b00d2f7-c70fa8bfcbcsi23407566a12.429.2026.03.02.20.51.29
+        for <baotg.it@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2026 20:51:30 -0800 (PST)
+Received-SPF: pass (google.com: domain of 010e019cb20971e1-10eaf00f-46d6-4af5-9523-383f41e0d765-000000@ap-southeast-1.amazonses.com designates 23.251.232.50 as permitted sender) client-ip=23.251.232.50;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=ogpodlam3jwjm4h26kavay65qjc5o352; d=card.vib.com.vn;
+	t=1772513489;
+	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type;
+	bh=LBwSkOGkWVLUT0ZUS/hXUceIh1svMrav1wdsjrAXl4A=;
+	b=oE+QcR1mfkqCqCk4pzS1OQlKR3Zpl9hq1fL5Se5jHUsiPvCdC2albcMYL4MtzyLM
+	edVh40O31pmGZLLniwEEIUt1kEdItckw5p2bvuzbGpYdZgclKP4SgDw6I0at+iz+LuR
+	eMpdR6jM4iIlVSFmYNpQVuoYp5PDreNL4hBs0aLlfwawiWdon1OJttJeVBkKGVP0coX
+	g3fwgtinXENjpyEhq/WUlzK7PHgBd/z2rFogKVN5mDKN/4hs7ZIvodfmJ40sj4wZMxJ
+	x+fo7jjL7IbbYNeWVFvcsTG2+cJ7AmMspHLwU2Wiwz2OX3mLiJoQxSkXgfuFhheiOtN
+	uVOO+Ol3wg==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=pd64dbxfdcqqbvadj6zks7h7qe3c33ao; d=amazonses.com; t=1772513489;
+	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type:Feedback-ID;
+	bh=LBwSkOGkWVLUT0ZUS/hXUceIh1svMrav1wdsjrAXl4A=;
+	b=JytEEAOCxWMVTjwntJe13Dr0XjRcN0PkUHZv6IPzxXJe6y65UONkWTi4liniNOzx
+	8eZLLAxulkSWGEnR/t+YeJCnua2xgcaVko42MfUcavtYPt1AQBZabdCTEesIOAgHS2i
+	rmV9ISyq3BLYBoKFqVkRWNSg6cedaOQ7ElhhJIXs=
+Date: Tue, 3 Mar 2026 04:51:29 +0000
+From: "Ngan hang Quoc Te (VIB)" <info@card.vib.com.vn>
+To: baotg.it@gmail.com
+Message-ID: <010e019cb20971e1-10eaf00f-46d6-4af5-9523-383f41e0d765-000000@ap-southeast-1.amazonses.com>
+Subject: =?UTF-8?Q?Th=C3=B4ng_b=C3=A1o_giao_d?=
+ =?UTF-8?Q?=E1=BB=8Bch_th=E1=BA=BB_t=C3=ADn_d=E1=BB=A5ng?=
+MIME-Version: 1.0
+Content-Type: multipart/mixed; 
+	boundary="----=_Part_5349613_2072935652.1772513488509"
+Feedback-ID: ::1.ap-southeast-1.vOocG9u0b7scnujt6MmZ51n2S0O5iSbf4fYeXipD0oE=:AmazonSES
+X-SES-Outgoing: 2026.03.03-23.251.232.50
+
+------=_Part_5349613_2072935652.1772513488509
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+        <!doctype html><html xmlns=3D"http://www.w3.org/1999/xhtml" xmlns:v=
+=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-microsoft-com:off=
+ice:office"><head><!--[if gte mso 15]><xml><o:OfficeDocumentSettings><o:All=
+owPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xm=
+l><![endif]--><meta charset=3D"UTF-8"><meta http-equiv=3D"X-UA-Compatible" =
+content=3D"IE=3Dedge"><meta name=3D"viewport" content=3D"width=3Ddevice-wid=
+th, initial-scale=3D1"><style type=3D"text/css"> * { box-sizing: border-box=
+; } body {margin: 0;}*{box-sizing:border-box;}body{margin-top:0px;margin-ri=
+ght:0px;margin-bottom:0px;margin-left:0px;font-family:helvetica, "helvetica=
+ neue", arial, verdana, sans-serif;}table{border-collapse:collapse;}p{paddi=
+ng-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;margin-top=
+:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;}td{font-size:14px;=
+font-family:helvetica, "helvetica neue", arial, verdana, sans-serif;word-br=
+eak:break-word;color:rgb(51, 51, 51);}h1, h2, h3, h4, h5, h6{display:block;=
+margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;padding-t=
+op:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;}img, a img{bo=
+rder-top-width:0px;border-right-width:0px;border-bottom-width:0px;border-le=
+ft-width:0px;border-top-style:initial;border-right-style:initial;border-bot=
+tom-style:initial;border-left-style:initial;border-top-color:initial;border=
+-right-color:initial;border-bottom-color:initial;border-left-color:initial;=
+border-image-source:initial;border-image-slice:initial;border-image-width:i=
+nitial;border-image-outset:initial;border-image-repeat:initial;height:auto;=
+outline-color:initial;outline-style:none;outline-width:initial;text-decorat=
+ion-line:none;text-decoration-style:initial;text-decoration-color:initial;}=
+a{color:rgb(51, 51, 51);}a[href^=3D"tel"], a[href^=3D"sms"]{color:rgb(51, 5=
+1, 51);cursor:default;text-decoration-line:none;text-decoration-style:initi=
+al;text-decoration-color:initial;}#outlook a{padding-top:0px;padding-right:=
+0px;padding-bottom:0px;padding-left:0px;}p, a, li, td, body, table, blockqu=
+ote{text-size-adjust:100%;}a[x-apple-data-detectors]{color:rgb(51, 51, 51) =
+!important;text-decoration-line:none !important;text-decoration-style:initi=
+al !important;text-decoration-color:initial !important;}h1{font-size:40px;f=
+ont-style:normal;font-weight:bold;line-height:60px;letter-spacing:normal;te=
+xt-align:center;color:rgb(51, 51, 51);}h2{font-size:34px;font-style:normal;=
+font-weight:bold;line-height:37px;letter-spacing:normal;color:rgb(51, 51, 5=
+1);}h3{font-size:22px;font-style:normal;font-weight:bold;letter-spacing:nor=
+mal;color:rgb(68, 68, 68);line-height:34px;}h4{color:rgb(51, 51, 51);font-s=
+ize:20px;font-weight:normal;letter-spacing:normal;line-height:25px;}.moBody=
+Container{border-top-width:0px;border-top-style:initial;border-top-color:in=
+itial;border-bottom-width:0px;border-bottom-style:initial;border-bottom-col=
+or:initial;padding-top:0px;padding-bottom:10px;height:200px;}.moText{font-s=
+ize:14px;font-family:helvetica, "helvetica neue", arial, verdana, sans-seri=
+f;word-break:break-word;color:rgb(51, 51, 51);}.moBodyContainer .moDividerC=
+ontent{border-top-width:2px;border-top-style:solid;border-top-color:rgb(51,=
+ 51, 51);}.im span{color:rgb(51, 51, 51);}.moTemplateContainer{width:600px;=
+max-width:600px;}.moImageContentContainer{width:100%;}ol, ul{margin-top:0px=
+;margin-right:0px;margin-bottom:0px;margin-left:0px;padding-top:10px;paddin=
+g-bottom:10px;padding-left:40px;}.moImage{display:inline !important;}.moTex=
+tContentContainer{width:100%;}.moContainerInner{width:600px;}.moTextContent=
+Container.moContainerInnerBlock{width:100%;}@media only screen and (max-wid=
+th: 768px){.moTemplateContainer{max-width:600px !important;}.moContainerInn=
+er{max-width:600px !important;}}@media (max-width: 485px){.moImage{width:10=
+0% !important;}}@media only screen and (max-width: 485px){.moImage{width:10=
+0% !important;}}@media only screen and (max-width: 480px){body, table, td, =
+p, a, li, blockquote{text-size-adjust:none !important;}.moTemplateContainer=
+{width:100% !important;}.moContainerInner{width:100% !important;}.moText{fo=
+nt-size:16px;}.moImage{width:100% !important;}}@media (max-width: 480px){#i=
+32zh{font-size:23px !important;line-height:33px !important;text-align:left =
+!important;}#i0j5z{padding-left:30px !important;padding-right:25px !importa=
+nt;}#ife2j{padding-left:30px !important;padding-right:30px !important;}#i5y=
+8dt{padding-left:30px !important;padding-right:30px !important;}#idn4c8{pad=
+ding-left:30px !important;}#icloz8{padding-left:30px !important;padding-rig=
+ht:30px !important;}#i78fhk{padding-left:30px !important;padding-right:30px=
+ !important;}#iq829w{padding-bottom:0px !important;padding-left:0px !import=
+ant;padding-top:0px !important;padding-right:0px !important;font-size:12px =
+!important;}#iuje82{padding-top:0px !important;padding-left:0px !important;=
+padding-bottom:0px !important;padding-right:0px !important;font-size:12px !=
+important;}#i7v5jt{padding-top:0px !important;padding-left:0px !important;p=
+adding-bottom:0px !important;padding-right:0px !important;font-size:12px !i=
+mportant;}#i1kysz{padding-top:0px !important;padding-left:0px !important;pa=
+dding-bottom:0px !important;padding-right:0px !important;font-size:12px !im=
+portant;}#iqfgcv{padding-left:30px !important;padding-right:30px !important=
+;}#i38cui{padding-top:0px !important;padding-left:0px !important;padding-bo=
+ttom:0px !important;padding-right:0px !important;font-size:12px !important;=
+}#irp34l{padding-top:0px !important;padding-left:0px !important;padding-bot=
+tom:0px !important;padding-right:0px !important;font-size:12px !important;}=
+#i9fp74{padding-left:30px !important;padding-right:30px !important;}#i8h4fa=
+{padding-top:0px !important;padding-left:0px !important;padding-bottom:0px =
+!important;padding-right:0px !important;font-size:12px !important;font-fami=
+ly:arial, "helvetica neue", helvetica, sans-serif !important;}#i7i0vw{width=
+:33% !important;text-align:left !important;}#i9j0jr{padding-left:25px !impo=
+rtant;}#irnvl{background-color:rgb(239, 246, 251) !important;}} @media only=
+ screen and (max-width: 483px) {.columnsContainer {display: block !importan=
+t; height: auto !important; width: 100% !important;}}  @media only screen a=
+nd (max-width: 479px) {.moViewContentItem {display: block !important; width=
+: 100% !important;}}  @media only screen and (max-width: 484px) {.moVideoIm=
+ageThumbnail {width: 100% !important;}}  @media only screen and (max-width:=
+ 479px) {.moImageContentItem {display: block !important; width: 100% !impor=
+tant;}}  ol,ul {margin: 0px; padding-top : 10px; padding-bottom : 10px; pad=
+ding-left : 40px;} </style> </head><body> <span class=3D"moPreviewText" sty=
+le=3D"display:none;font-size:0px;line-height:0px;max-height:0px;max-width:0=
+px;opacity:0;overflow:hidden;visibility:hidden;mso-hide:all;"></span><table=
+ mo-type=3D"center" align=3D"center" border=3D"0" cellpadding=3D"0" cellspa=
+cing=3D"0" height=3D"100%" width=3D"100%" id=3D"bodyTable" style=3D"margin:=
+0 auto;"><tbody><tr mo-type=3D"center"><td mo-type=3D"center" align=3D"cent=
+er" valign=3D"top" id=3D"bodyCell"><table mo-type=3D"header" border=3D"0" c=
+ellpadding=3D"0" cellspacing=3D"0" id=3D"moTemplateHeader" style=3D"width:1=
+00%;border:none;background-color:#f4f4f4;"><tbody mo-type=3D"header"><tr mo=
+-type=3D"header"><td mo-type=3D"header" align=3D"center" valign=3D"top"><ta=
+ble class=3D"moTemplateContainer" mo-type=3D"header" cellpadding=3D"0" cell=
+spacing=3D"0" width=3D"600" style=3D"background-color:#1069ad;"><tbody mo-t=
+ype=3D"header"><tr mo-type=3D"header"><td class=3D"moHeaderContainer" mo-ty=
+pe=3D"header" valign=3D"top" style=3D"padding-top:10px;padding-bottom:20px;=
+padding-left:10px;padding-right:10px;"><table class=3D"moImageContentContai=
+ner" mo-type=3D"image" align=3D"center" border=3D"0" cellpadding=3D"0" cell=
+spacing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"image"><tr mo-type=3D=
+"image"><td class=3D"moImageBlockInner" mo-type=3D"image" valign=3D"top" al=
+ign=3D"center" id=3D"i9j0jr" style=3D"padding-left:45px;padding-bottom:0px;=
+"><table class=3D"moImageContentContainerInner" mo-type=3D"image" border=3D=
+"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" style=3D"width:100%;=
+"><tbody mo-type=3D"image"><tr mo-type=3D"image"><td class=3D"moImageConten=
+tInner" mo-type=3D"image" valign=3D"top" align=3D"center"><a class=3D"moIma=
+geContent" mo-type=3D"image" href=3D"" target=3D"_blank" style=3D"cursor:de=
+fault;"><img class=3D"moImage" mo-type=3D"image" align=3D"left" alt=3D"" sr=
+c=3D"https://promotion.vib.com.vn/static/27ffc853-c41c-456c-b590-41988649fb=
+4f/Logo_VIB_-_white_-_Copy.png" onmousedown=3D"return false" id=3D"i7i0vw" =
+width=3D"80.3" style=3D"width:15%;text-align:left;"></a></td></tr></tbody><=
+/table></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbod=
+y></table><table mo-type=3D"body" id=3D"moTemplateBody" border=3D"0" cellpa=
+dding=3D"0" cellspacing=3D"0" style=3D"width:100%;margin:0 auto;background-=
+color:#f4f4f4;"><tbody mo-type=3D"body"><tr mo-type=3D"body"><td class=3D"m=
+oContainerInner" mo-type=3D"body" align=3D"center" valign=3D"top" width=3D"=
+600"><table class=3D"moTemplateContainer moContainerInnerBlock" mo-type=3D"=
+body" align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" wid=
+th=3D"600" id=3D"irnvl" style=3D"background-color:#ffffff;"><tbody mo-type=
+=3D"body"><tr mo-type=3D"body"><td class=3D"moBodyContainer" mo-type=3D"bod=
+y" valign=3D"top"><table mo-type=3D"container" border=3D"0" cellpadding=3D"=
+0" cellspacing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"content"><tr m=
+o-type=3D"content"><td class=3D"moContainerOuterBlock urdnf" mo-type=3D"con=
+tent" align=3D"center" valign=3D"top" id=3D"i0j5z" style=3D"padding:10px;pa=
+dding-left:55px;padding-right:55px;padding-top:25px;padding-bottom:25px;bac=
+kground-color:#ffffff;"><table class=3D"moContainerInnerBlock" mo-type=3D"c=
+ontent" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"width:100=
+%;background-color:#ffffff;"><tbody mo-type=3D"content"><tr class=3D"rowCon=
+tent" mo-type=3D"content"><td class=3D"contentContainer" mo-type=3D"content=
+" align=3D"left" valign=3D"top" style=3D"width:100%;"><table class=3D"moTex=
+tContentContainer" mo-type=3D"text" align=3D"left" border=3D"0" cellpadding=
+=3D"0" cellspacing=3D"0"><tbody mo-type=3D"text"><tr mo-type=3D"text"><td c=
+lass=3D"moText" mo-type=3D"text" valign=3D"top" id=3D"i32zh" style=3D"paddi=
+ng:5px;color:rgb(51, 51, 51);line-height:54px;font-size:23px;font-family:ar=
+ial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:=
+normal;padding-top:0px;padding-left:0px;padding-bottom:0px;padding-right:0p=
+x;" contenteditable=3D"false"><div style=3D"font-style:normal;font-family:a=
+rial, &quot;helvetica neue&quot;, helvetica, sans-serif;color:rgb(51, 51, 5=
+1);"><b><font style=3D"font-size:24px;">Th=C3=B4ng b=C3=A1o giao d=E1=BB=8B=
+ch Th=E1=BA=BB t=C3=ADn d=E1=BB=A5ng VIB Online Plus 2in1</font></b></div><=
+/td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></tabl=
+e><table mo-type=3D"container" border=3D"0" cellpadding=3D"0" cellspacing=
+=3D"0" style=3D"width:100%;" class=3D""><tbody mo-type=3D"content"><tr mo-t=
+ype=3D"content"><td class=3D"moContainerOuterBlock tpfuh" mo-type=3D"conten=
+t" align=3D"center" valign=3D"top" id=3D"ife2j" style=3D"padding:10px;paddi=
+ng-left:55px;padding-right:55px;padding-top:0px;padding-bottom:0px;backgrou=
+nd-color:#ffffff;"><table class=3D"moContainerInnerBlock" mo-type=3D"conten=
+t" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"width:100%;bac=
+kground-color:#ffffff;"><tbody mo-type=3D"content"><tr class=3D"rowContent"=
+ mo-type=3D"content"><td class=3D"contentContainer" mo-type=3D"content" ali=
+gn=3D"left" valign=3D"top" style=3D"width:100%;"><table class=3D"moTextCont=
+entContainer" mo-type=3D"text" align=3D"left" border=3D"0" cellpadding=3D"0=
+" cellspacing=3D"0"><tbody mo-type=3D"text"><tr mo-type=3D"text"><td class=
+=3D"moText" mo-type=3D"text" valign=3D"top" align=3D"left" style=3D"padding=
+:5px;color:rgb(51, 51, 51);line-height:21px;font-size:14px;font-family:aria=
+l, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:no=
+rmal;padding-top:0px;padding-left:0px;padding-bottom:0px;padding-right:0px;=
+text-align:left;" contenteditable=3D"false"><div><div style=3D"text-size-ad=
+just:auto;"><div style=3D"text-size-adjust:auto;"><div><font><div><div><b>K=
+=C3=ADnh g=E1=BB=ADi Qu=C3=BD kh=C3=A1ch h=C3=A0ng,&nbsp;</b></div><div><b>=
+<br></b></div><div style=3D"text-align:justify;"><div>Ng=C3=A2n h=C3=A0ng Q=
+u=E1=BB=91c T=E1=BA=BF (VIB) c=E1=BA=A3m =C6=A1n Qu=C3=BD kh=C3=A1ch h=C3=
+=A0ng =C4=91=C3=A3 giao d=E1=BB=8Bch qua Th=E1=BA=BB t=C3=ADn d=E1=BB=A5ng =
+VIB Online Plus 2in1. VIB xin g=E1=BB=ADi th=C3=B4ng tin giao d=E1=BB=8Bch =
+c=E1=BB=A7a Qu=C3=BD kh=C3=A1ch h=C3=A0ng nh=C6=B0 sau:</div><div><br></div=
+></div><div style=3D"text-align:justify;"><div><div>S=E1=BB=91 th=E1=BA=BB:=
+ <b>5268***3021</b></div><div>Ch=E1=BB=A7 th=E1=BA=BB: <b> TRAN GIA BAO</b>=
+</div><div>Giao d=E1=BB=8Bch: <b>Thanh to=C3=A1n d=E1=BB=8Bch v=E1=BB=A5 - =
+h=C3=A0ng h=C3=B3a</b></div><div>Gi=C3=A1 tr=E1=BB=8B: <b>48,000 VND</b></d=
+iv><div>V=C3=A0o l=C3=BAc: <b>11:50 03/03/2026</b></div><div>T=E1=BA=A1i <b=
+>CIRCLE K_SG0268</b></div><div><br></div></div><div style=3D"text-align:lef=
+t;"><div style=3D"text-align:left;"><div>=C4=90=E1=BB=83 bi=E1=BA=BFt th=C3=
+=AAm th=C3=B4ng tin chi ti=E1=BA=BFt, Qu=C3=BD kh=C3=A1ch h=C3=A0ng vui l=
+=C3=B2ng li=C3=AAn h=E1=BB=87 D=E1=BB=8Bch v=E1=BB=A5 kh=C3=A1ch h=C3=A0ng =
+24/7 c=E1=BB=A7a VIB: KH trong n=C6=B0=E1=BB=9Bc g=E1=BB=8Di <b>19002200</b=
+> (1.000 =C4=91=E1=BB=93ng/ph=C3=BAt), KH =E1=BB=9F n=C6=B0=E1=BB=9Bc ngo=
+=C3=A0i  g=E1=BB=8Di <b>(024) 62 58 58 58</b> ho=E1=BA=B7c g=E1=BB=ADi emai=
+l t=E1=BB=9Bi: <b>dvkh247@vib.com.vn</b></div><div><br></div><div>Ng=C3=A2n=
+ h=C3=A0ng Qu=E1=BB=91c T=E1=BA=BF (VIB)</div><div><br></div><div>Tr=C3=A2n=
+ tr=E1=BB=8Dng.</div></div></div></div></div></font></div></div></div></div=
+></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></ta=
+ble></td></tr></tbody></table></td></tr></tbody></table><table mo-type=3D"f=
+ooter" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" id=3D"moTemplateFoo=
+ter" style=3D"width:100%;background-color:#f4f4f4;" class=3D""><tbody mo-ty=
+pe=3D"footer"><tr mo-type=3D"footer"><td mo-type=3D"footer" align=3D"center=
+" valign=3D"top"><table class=3D"moTemplateContainer" mo-type=3D"footer" al=
+ign=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"60=
+0" style=3D"background-color:#0066b3;"><tbody mo-type=3D"footer"><tr mo-typ=
+e=3D"footer"><td class=3D"moFooterContainer" mo-type=3D"footer" valign=3D"t=
+op" style=3D"padding-top:40px;padding-bottom:0px;"><table class=3D"moTextCo=
+ntentContainer" mo-type=3D"text" border=3D"0" cellpadding=3D"0" cellspacing=
+=3D"0" style=3D"width:100%;"><tbody mo-type=3D"text"><tr mo-type=3D"text"><=
+td class=3D"moText" mo-type=3D"text" valign=3D"top" align=3D"justify" id=3D=
+"i5y8dt" style=3D"padding:5px;color:rgb(255, 255, 255);line-height:25px;fon=
+t-size:14px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font=
+-weight:normal;font-style:normal;padding-top:0px;padding-left:55px;padding-=
+bottom:0px;padding-right:0px;"><div style=3D"line-height:25px;font-family:a=
+rial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style=
+:normal;"><span style=3D"caret-color:rgb(255, 255, 255);font-family:arial, =
+'helvetica neue', helvetica, sans-serif;text-align:justify;text-size-adjust=
+:auto;background-color:rgb(16, 105, 173);line-height:25px;font-weight:norma=
+l;font-style:normal;"><font><b>Theo d=C3=B5i ch=C3=BAng t=C3=B4i t=E1=BA=A1=
+i
+                                    </b></font></span></div></td></tr></tbo=
+dy></table><table mo-type=3D"social" border=3D"0" cellspacing=3D"0" cellpad=
+ding=3D"0" style=3D"width:100%;"><tbody class=3D"moSocialOuterBlock" mo-typ=
+e=3D"social"><tr mo-type=3D"social"><td class=3D"moSocialInnerBlock" mo-typ=
+e=3D"social" align=3D"left" id=3D"idn4c8" style=3D"padding:5px;padding-top:=
+10px;padding-left:50px;padding-bottom:0px;padding-right:0px;"><table class=
+=3D"moSocialContentBlock" mo-type=3D"social" icon=3D"outline" color=3D"ligh=
+t" border=3D"0" cellspacing=3D"0" cellpadding=3D"0"><tbody mo-type=3D"socia=
+l"><tr mo-type=3D"social"><td class=3D"moSocialContentInnerBlock" mo-type=
+=3D"social" align=3D"center" valign=3D"top"><table class=3D"moSocialContent=
+Item" mo-type=3D"social" social=3D"facebook" border=3D"0" cellspacing=3D"0"=
+ cellpadding=3D"0" style=3D"display:inline-block;"><tbody mo-type=3D"social=
+"><tr mo-type=3D"social"><td mo-type=3D"image" social=3D"facebook" align=3D=
+"center" width=3D"34" style=3D"padding:5px;width:auto;padding-left:5px;padd=
+ing-top:5px;padding-bottom:5px;padding-right:5px;"><a mo-type=3D"image" soc=
+ial=3D"facebook" href=3D"https://www.facebook.com/VIB.NHQT" target=3D"_blan=
+k" follow=3D"1" tags=3D"[]" style=3D"cursor:pointer;"><img mo-type=3D"image=
+" src=3D"https://investor.vib.com.vn/static/28d07ccb-f70d-436b-8727-9106a83=
+1a399/fb.png" border=3D"0" width=3D"40.0" alt=3D"Facebook" onmousedown=3D"r=
+eturn false" style=3D"width:40px;"></a></td></tr></tbody></table></td><td><=
+table class=3D"moSocialContentItem" mo-type=3D"social" social=3D"youtube" b=
+order=3D"0" cellspacing=3D"0" cellpadding=3D"0" style=3D"display:inline-blo=
+ck;"><tbody mo-type=3D"social"><tr mo-type=3D"social"><td mo-type=3D"image"=
+ social=3D"youtube" align=3D"center" width=3D"34" style=3D"padding:5px;widt=
+h:auto;padding-left:5px;padding-top:5px;padding-bottom:5px;padding-right:5p=
+x;"><a mo-type=3D"image" social=3D"youtube" href=3D"https://www.youtube.com=
+/@VIBVNBank" target=3D"_blank" follow=3D"1" tags=3D"[]" style=3D"cursor:poi=
+nter;"><img mo-type=3D"image" src=3D"https://investor.vib.com.vn/static/28d=
+07ccb-f70d-436b-8727-9106a831a399/Youtube.png" border=3D"0" width=3D"40.0" =
+alt=3D"Youtube" onmousedown=3D"return false" style=3D"width:40px;"></a></td=
+></tr></tbody></table></td><td><table class=3D"moSocialContentItem" mo-type=
+=3D"social" social=3D"instagram" border=3D"0" cellspacing=3D"0" cellpadding=
+=3D"0" style=3D"display:inline-block;"><tbody mo-type=3D"social"><tr mo-typ=
+e=3D"social"><td mo-type=3D"image" social=3D"Instagram" align=3D"center" wi=
+dth=3D"34" style=3D"padding:5px;width:auto;padding-left:5px;padding-top:5px=
+;padding-bottom:5px;padding-right:5px;"><a mo-type=3D"image" social=3D"Inst=
+agram" href=3D"https://www.instagram.com/vib_nhqt/" target=3D"_blank" follo=
+w=3D"1" tags=3D"[]" style=3D"cursor:pointer;"><img mo-type=3D"image" src=3D=
+"https://investor.vib.com.vn/static/28d07ccb-f70d-436b-8727-9106a831a399/In=
+ts.png" border=3D"0" width=3D"40.0" alt=3D"Instagram" onmousedown=3D"return=
+ false" style=3D"width:40px;"></a></td></tr></tbody></table></td></tr></tbo=
+dy></table></td></tr></tbody></table><table mo-type=3D"container" border=3D=
+"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"width:100%;"><tbody mo-typ=
+e=3D"content"><tr mo-type=3D"content"><td class=3D"moContainerOuterBlock vd=
+qrv" mo-type=3D"content" align=3D"center" valign=3D"top" id=3D"i9fp74" styl=
+e=3D"padding:10px;padding-left:55px;padding-right:55px;"><table class=3D"mo=
+ContainerInnerBlock" mo-type=3D"content" border=3D"0" cellpadding=3D"0" cel=
+lspacing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"content"><tr class=
+=3D"rowContent" mo-type=3D"content"><td class=3D"contentContainer" mo-type=
+=3D"content" align=3D"left" valign=3D"top" style=3D"width:100%;"><table cla=
+ss=3D"moTextContentContainer" mo-type=3D"text" align=3D"left" border=3D"0" =
+cellpadding=3D"0" cellspacing=3D"0" style=3D"width:100%;"><tbody mo-type=3D=
+"text"><tr mo-type=3D"text"><td class=3D"moText" mo-type=3D"text" valign=3D=
+"top" id=3D"i8h4fa" style=3D"padding:5px;color:rgb(255, 255, 255);line-heig=
+ht:150%;font-size:14px;font-family:helvetica, 'helvetica neue', arial, verd=
+ana, sans-serif;font-weight:normal;font-style:normal;"><div>Ng=C3=A2n h=C3=
+=A0ng Qu=E1=BB=91c T=E1=BA=BF (VIB)</div></td></tr></tbody></table> </td></=
+tr></tbody></table></td></tr></tbody></table><table mo-type=3D"container" b=
+order=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"width:100%;"><tbod=
+y mo-type=3D"content"><tr mo-type=3D"content"><td class=3D"moContainerOuter=
+Block aezlq" mo-type=3D"content" align=3D"center" valign=3D"top" id=3D"iclo=
+z8" style=3D"padding:10px;padding-left:55px;padding-right:55px;padding-top:=
+0px;padding-bottom:0px;"><table class=3D"moContainerInnerBlock" mo-type=3D"=
+content" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"width:10=
+0%;"><tbody mo-type=3D"content"><tr class=3D"rowContent" mo-type=3D"content=
+"><td class=3D"contentContainer" mo-type=3D"content" align=3D"left" valign=
+=3D"top" style=3D"width:33.66%;"><table class=3D"moTextContentContainer" mo=
+-type=3D"text" align=3D"left" border=3D"0" cellpadding=3D"0" cellspacing=3D=
+"0" style=3D"width:100%;"><tbody mo-type=3D"text"><tr mo-type=3D"text"><td =
+class=3D"moText" mo-type=3D"text" valign=3D"top" id=3D"i7v5jt" style=3D"pad=
+ding:5px;color:rgb(255, 255, 255);line-height:150%;font-size:14px;font-fami=
+ly:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-s=
+tyle:normal;"><div>=C4=90=E1=BB=8Ba ch=E1=BB=89</div></td></tr></tbody></ta=
+ble> </td><td class=3D"contentContainer" mo-type=3D"content" align=3D"left"=
+ valign=3D"top" style=3D"width:66.33%;"><table class=3D"moTextContentContai=
+ner" mo-type=3D"text" align=3D"left" border=3D"0" cellpadding=3D"0" cellspa=
+cing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"text"><tr mo-type=3D"tex=
+t"><td class=3D"moText" mo-type=3D"text" valign=3D"top" id=3D"iuje82" style=
+=3D"padding:5px;color:rgb(255, 255, 255);line-height:150%;font-size:14px;fo=
+nt-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal=
+;font-style:normal;"><div><p class=3D"MsoNormal" style=3D"margin:0cm;text-s=
+ize-adjust:auto;caret-color:rgb(0, 0, 0);line-height:25px;"><span style=3D"=
+line-height:25px;">2nd Floor, Sailing Tower,&nbsp;</span><span><a href=3D"h=
+ttps://www.google.com/maps/place/Sailing+Tower/@10.7799609,106.6935524,17z/=
+data=3D!3m1!4b1!4m5!3m4!1s0x31752f3714af5889:0x55f800ab68f8a82!8m2!3d10.779=
+9521!4d106.6957508" follow=3D"1" title=3D"" target=3D"_blank" style=3D"colo=
+r:rgb(255, 255, 255);cursor:pointer;text-decoration-line:none !important;">=
+111A Pasteur Street</a>, HCMC, Vietnam</span></p></div></td></tr></tbody></=
+table> </td></tr></tbody></table></td></tr></tbody></table><table mo-type=
+=3D"container" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"wi=
+dth:100%;"><tbody mo-type=3D"content"><tr mo-type=3D"content"><td class=3D"=
+moContainerOuterBlock bzkbu" mo-type=3D"content" align=3D"center" valign=3D=
+"top" id=3D"i78fhk" style=3D"padding:10px;padding-left:55px;padding-right:5=
+5px;padding-top:0px;padding-bottom:0px;"><table class=3D"moContainerInnerBl=
+ock" mo-type=3D"content" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" s=
+tyle=3D"width:100%;"><tbody mo-type=3D"content"><tr class=3D"rowContent" mo=
+-type=3D"content"><td class=3D"contentContainer" mo-type=3D"content" align=
+=3D"left" valign=3D"top" style=3D"width:33.66%;"><table class=3D"moTextCont=
+entContainer" mo-type=3D"text" align=3D"left" border=3D"0" cellpadding=3D"0=
+" cellspacing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"text"><tr mo-ty=
+pe=3D"text"><td class=3D"moText" mo-type=3D"text" valign=3D"top" id=3D"iq82=
+9w" style=3D"padding:5px;color:rgb(255, 255, 255);line-height:150%;font-siz=
+e:14px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weig=
+ht:normal;font-style:normal;"><div><span style=3D"caret-color:rgb(0, 0, 0);=
+">Email</span></div></td></tr></tbody></table></td><td class=3D"contentCont=
+ainer" mo-type=3D"content" align=3D"left" valign=3D"top" style=3D"width:66.=
+33%;"><table class=3D"moTextContentContainer" mo-type=3D"text" align=3D"lef=
+t" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"width:100%;"><=
+tbody mo-type=3D"text"><tr mo-type=3D"text"><td class=3D"moText" mo-type=3D=
+"text" valign=3D"top" id=3D"i1kysz" style=3D"padding:5px;color:rgb(255, 255=
+, 255);line-height:150%;font-size:14px;font-family:arial, 'helvetica neue',=
+ helvetica, sans-serif;font-weight:normal;font-style:normal;"><div><p class=
+=3D"MsoNormal" style=3D"margin:0cm;text-size-adjust:auto;caret-color:rgb(0,=
+ 0, 0);line-height:25px;"><font>dvkh247</font><a href=3D"mailto:dvkh247@vib=
+.com.vn" target=3D"_blank" style=3D"cursor:pointer;text-decoration-line:non=
+e !important;"><font style=3D"color:rgb(255, 255, 255);">@vib.com.vn</font>=
+</a></p></div></td></tr></tbody></table></td></tr></tbody></table></td></tr=
+></tbody></table><table mo-type=3D"container" border=3D"0" cellpadding=3D"0=
+" cellspacing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"content"><tr mo=
+-type=3D"content"><td class=3D"moContainerOuterBlock bkajh" mo-type=3D"cont=
+ent" align=3D"center" valign=3D"top" id=3D"iqfgcv" style=3D"padding:10px;pa=
+dding-left:55px;padding-right:55px;padding-top:0px;padding-bottom:30px;"><t=
+able class=3D"moContainerInnerBlock" mo-type=3D"content" border=3D"0" cellp=
+adding=3D"0" cellspacing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"cont=
+ent"><tr class=3D"rowContent" mo-type=3D"content"><td class=3D"contentConta=
+iner" mo-type=3D"content" align=3D"left" valign=3D"top" style=3D"width:33.6=
+6%;"><table class=3D"moTextContentContainer" mo-type=3D"text" align=3D"left=
+" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"width:100%;"><t=
+body mo-type=3D"text"><tr mo-type=3D"text"><td class=3D"moText" mo-type=3D"=
+text" valign=3D"top" id=3D"i38cui" style=3D"padding:5px;color:rgb(255, 255,=
+ 255);line-height:150%;font-size:14px;font-family:arial, 'helvetica neue', =
+helvetica, sans-serif;font-weight:normal;font-style:normal;"><div><span sty=
+le=3D"caret-color:rgb(0, 0, 0);">Website</span></div></td></tr></tbody></ta=
+ble></td><td class=3D"contentContainer" mo-type=3D"content" align=3D"left" =
+valign=3D"top" style=3D"width:66.33%;"><table class=3D"moTextContentContain=
+er" mo-type=3D"text" align=3D"left" border=3D"0" cellpadding=3D"0" cellspac=
+ing=3D"0" style=3D"width:100%;"><tbody mo-type=3D"text"><tr mo-type=3D"text=
+"><td class=3D"moText" mo-type=3D"text" valign=3D"top" id=3D"irp34l" style=
+=3D"padding:5px;color:rgb(255, 255, 255);line-height:150%;font-size:11px;fo=
+nt-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal=
+;font-style:normal;"><div><p class=3D"MsoNormal" style=3D"margin:0cm;text-s=
+ize-adjust:auto;caret-color:rgb(0, 0, 0);line-height:25px;"><a href=3D"http=
+s://vib.com.vn/" follow=3D"1" title=3D"" target=3D"_blank" style=3D"cursor:=
+pointer;text-decoration-line:none !important;"><font id=3D"iowa8c" style=3D=
+"color:rgb(255, 255, 255);font-size:14px;">www.vib.com.vn</font></a></p></d=
+iv></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></=
+table></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody=
+></table></body></html>
+   =20
+------=_Part_5349613_2072935652.1772513488509--

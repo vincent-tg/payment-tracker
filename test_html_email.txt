@@ -1,0 +1,54 @@
+Subject: Your Chase Credit Card Transaction
+From: chase@alerts.chase.com
+Date: Fri, 06 Mar 2026 14:47:00 +0000
+Content-Type: multipart/alternative; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain; charset=utf-8
+
+Dear Cardmember,
+
+A transaction has been posted to your account.
+
+Amount: $129.99
+Merchant: AMAZON.COM
+Date: March 6, 2026
+Transaction Type: Purchase
+
+Thank you,
+Chase
+
+--boundary123
+Content-Type: text/html; charset=utf-8
+
+<html>
+<body>
+<div style="font-family: Arial, sans-serif;">
+  <h2>Transaction Alert</h2>
+  <p>Dear Cardmember,</p>
+  
+  <table border="0" cellpadding="10">
+    <tr>
+      <td><strong>Amount:</strong></td>
+      <td>$129.99</td>
+    </tr>
+    <tr>
+      <td><strong>Merchant:</strong></td>
+      <td>AMAZON.COM</td>
+    </tr>
+    <tr>
+      <td><strong>Date:</strong></td>
+      <td>March 6, 2026</td>
+    </tr>
+    <tr>
+      <td><strong>Type:</strong></td>
+      <td>Purchase</td>
+    </tr>
+  </table>
+  
+  <p>Thank you,<br>Chase</p>
+</div>
+</body>
+</html>
+
+--boundary123--

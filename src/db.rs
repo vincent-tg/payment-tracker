@@ -1,79 +1,151 @@
 use anyhow::Result;
 use chrono::{DateTime, Datelike, Local, NaiveDate};
-use sqlx::{sqlite::SqlitePoolOptions, Row, SqlitePool};
+use sqlx::{postgres::PgPoolOptions, Row, PgPool};
 use std::str::FromStr;
 
 use crate::models::{Summary, Transaction};
 
 pub struct Database {
-    pool: SqlitePool,
+    pool: PgPool,
 }
 
 impl Database {
-    pub async fn new(db_path: &str) -> Result<Self> {
-        let pool = SqlitePoolOptions::new()
-            .connect(&format!("sqlite://{}", db_path))
+    pub async fn new(connection_string: &str) -> Result<Self> {
+        let pool = PgPoolOptions::new()
+            .connect(connection_string)
             .await?;
         
         Ok(Self { pool })
     }
     
-    pub async fn init_database(db_path: &str) -> Result<()> {
-        let pool = SqlitePoolOptions::new()
-            .connect(&format!("sqlite://{}", db_path))
+    pub async fn init_database(connection_string: &str) -> Result<()> {
+        let pool = PgPoolOptions::new()
+            .connect(connection_string)
             .await?;
         
         sqlx::query(
             r#"
             CREATE TABLE IF NOT EXISTS transactions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id SERIAL PRIMARY KEY,
                 date DATE NOT NULL,
                 description TEXT NOT NULL,
-                amount REAL NOT NULL,
+                amount DOUBLE PRECISION NOT NULL,
+                currency TEXT NOT NULL DEFAULT 'USD',
                 type TEXT NOT NULL CHECK (type IN ('in', 'out')),
                 source TEXT NOT NULL,
+                bank TEXT NOT NULL DEFAULT 'Unknown',
+                transaction_id TEXT,
+                email_message_id TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(date, description, amount, type)
+                UNIQUE(transaction_id, bank),
+                UNIQUE(email_message_id)
             )
             "#,
         )
         .execute(&pool)
         .await?;
         
-        println!("Database initialized successfully at: {}", db_path);
+        println!("Database initialized successfully with connection: {}", connection_string);
         Ok(())
     }
     
     pub async fn insert_transaction(&self, transaction: &Transaction) -> Result<i64> {
-        let result = sqlx::query(
-            r#"
-            INSERT OR IGNORE INTO transactions (date, description, amount, type, source, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
-            "#,
-        )
-        .bind(transaction.date.to_string())
-        .bind(&transaction.description)
-        .bind(transaction.amount)
-        .bind(&transaction.r#type)
-        .bind(&transaction.source)
-        .bind(transaction.created_at.to_string())
-        .execute(&self.pool)
-        .await?;
+        // Use transaction_id for upsert if available, otherwise use email_message_id
+        let conflict_target = if transaction.transaction_id.is_some() {
+            "(transaction_id, bank)"
+        } else if transaction.email_message_id.is_some() {
+            "(email_message_id)"
+        } else {
+            // Fallback to composite key
+            "(date, description, amount, type, currency, bank)"
+        };
         
-        Ok(result.last_insert_rowid())
+        let query = format!(
+            r#"
+            INSERT INTO transactions (date, description, amount, currency, type, source, bank, transaction_id, email_message_id, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            ON CONFLICT {conflict_target} 
+            DO UPDATE SET 
+                date = EXCLUDED.date,
+                description = EXCLUDED.description,
+                amount = EXCLUDED.amount,
+                currency = EXCLUDED.currency,
+                type = EXCLUDED.type,
+                source = EXCLUDED.source,
+                created_at = EXCLUDED.created_at
+            RETURNING id
+            "#
+        );
+        
+        let result = sqlx::query(&query)
+            .bind(transaction.date.to_string())
+            .bind(&transaction.description)
+            .bind(transaction.amount)
+            .bind(&transaction.currency)
+            .bind(&transaction.r#type)
+            .bind(&transaction.source)
+            .bind(&transaction.bank)
+            .bind(transaction.transaction_id.as_deref())
+            .bind(transaction.email_message_id.as_deref())
+            .bind(transaction.created_at.to_string())
+            .fetch_one(&self.pool)
+            .await?;
+        
+        let id: i64 = result.get("id");
+        Ok(id)
     }
     
     pub async fn transaction_exists(&self, transaction: &Transaction) -> Result<bool> {
+        // First check by transaction_id if available
+        if let Some(ref transaction_id) = transaction.transaction_id {
+            let result = sqlx::query(
+                r#"
+                SELECT COUNT(*) as count FROM transactions
+                WHERE transaction_id = $1 AND bank = $2
+                "#,
+            )
+            .bind(transaction_id)
+            .bind(&transaction.bank)
+            .fetch_one(&self.pool)
+            .await?;
+            
+            let count: i64 = result.get("count");
+            if count > 0 {
+                return Ok(true);
+            }
+        }
+        
+        // Then check by email_message_id if available
+        if let Some(ref email_message_id) = transaction.email_message_id {
+            let result = sqlx::query(
+                r#"
+                SELECT COUNT(*) as count FROM transactions
+                WHERE email_message_id = $1
+                "#,
+            )
+            .bind(email_message_id)
+            .fetch_one(&self.pool)
+            .await?;
+            
+            let count: i64 = result.get("count");
+            if count > 0 {
+                return Ok(true);
+            }
+        }
+        
+        // Fallback to composite key check
         let result = sqlx::query(
             r#"
             SELECT COUNT(*) as count FROM transactions
-            WHERE date = ? AND description = ? AND amount = ? AND type = ?
+            WHERE date = $1 AND description = $2 AND amount = $3 AND type = $4 AND currency = $5 AND bank = $6
             "#,
         )
         .bind(transaction.date.to_string())
         .bind(&transaction.description)
         .bind(transaction.amount)
         .bind(&transaction.r#type)
+        .bind(&transaction.currency)
+        .bind(&transaction.bank)
         .fetch_one(&self.pool)
         .await?;
         
@@ -127,8 +199,12 @@ impl Database {
                 date: NaiveDate::from_str(&row.date).unwrap_or_else(|_| Local::now().date_naive()),
                 description: row.description,
                 amount: row.amount,
+                currency: row.currency,
                 r#type: row.r#type,
                 source: row.source,
+                bank: row.bank,
+                transaction_id: row.transaction_id,
+                email_message_id: row.email_message_id,
                 created_at: DateTime::from_str(&row.created_at).unwrap_or(Local::now()),
             })
             .collect();
@@ -179,7 +255,7 @@ impl Database {
                 COALESCE(SUM(CASE WHEN type = 'in' THEN amount ELSE 0 END), 0) as total_in,
                 COALESCE(SUM(CASE WHEN type = 'out' THEN amount ELSE 0 END), 0) as total_out
             FROM transactions
-            WHERE date BETWEEN ? AND ?
+            WHERE date BETWEEN $1 AND $2
             "#,
         )
         .bind(start_date.to_string())
@@ -199,7 +275,7 @@ impl Database {
                 SUBSTR(description, 1, INSTR(description || ' ', ' ') - 1) as category,
                 SUM(amount) as amount
             FROM transactions
-            WHERE date BETWEEN ? AND ? AND type = 'out'
+            WHERE date BETWEEN $1 AND $2 AND type = 'out'
             GROUP BY category
             ORDER BY amount DESC
             LIMIT 5
@@ -235,7 +311,11 @@ struct TransactionRow {
     date: String,
     description: String,
     amount: f64,
+    currency: String,
     r#type: String,
     source: String,
+    bank: String,
+    transaction_id: Option<String>,
+    email_message_id: Option<String>,
     created_at: String,
 }

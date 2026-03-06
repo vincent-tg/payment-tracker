@@ -1,5 +1,4 @@
 use anyhow::{Result, anyhow};
-use base64::Engine;
 use chrono::{Local, NaiveDate};
 use imap;
 use mailparse::*;
@@ -123,13 +122,6 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
         Err(_) => return None,
     };
     
-    // Extract email message ID from headers for upsert tracking
-    let email_message_id = parsed
-        .headers
-        .get_first_value("Message-ID")
-        .or_else(|| parsed.headers.get_first_value("Message-Id"))
-        .or_else(|| parsed.headers.get_first_value("message-id"));
-    
     // Get the email body (prefer plain text, fall back to HTML)
     let body = extract_email_body(&parsed);
     
@@ -181,18 +173,14 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
         // Generic transaction alert patterns
         (r"(?i)(?:transaction|purchase|payment|debit|credit)\s+(?:alert|notice|notification)\s*[-–]?\s*[$€£¥]?\s*([\d,]+\.?\d{2})", 1),
         
-        // Pattern 1: VND XX,XXX format (Vietnamese Dong, no decimal) - SPECIFIC
-        (r"(?i)(\d{1,3}(?:,\d{3})*)\s*VND\b", 1),
-        // Pattern 2: USD XX.XX format - SPECIFIC
-        (r"(?i)(?:USD|EUR|GBP|JPY|AUD|CAD)\s*([\d,]+(?:\.\d{2})?)\b", 1),
-        // Pattern 3: Amount: $XX.XX format (most common)
-        (r"(?i)(?:amount|transaction\s+amount|total\s+amount|payment\s+amount|giá\s+trị|giá trị)\s*[:=]\s*[$€£¥]?\s*([\d,]+\.?\d{2})", 1),
-        // Pattern 4: $XX.XX amount format (standalone)
+        // Pattern 1: Amount: $XX.XX format (most common)
+        (r"(?i)(?:amount|transaction\s+amount|total\s+amount|payment\s+amount)\s*[:=]\s*[$€£¥]?\s*([\d,]+\.?\d{2})", 1),
+        // Pattern 2: $XX.XX amount format (standalone)
         (r"(?i)[$€£¥]\s*([\d,]+\.?\d{2})\b", 1),
-        // Pattern 5: XX.XX with transaction context (more specific)
-        (r"(?i)(?:for|of|total|amount|payment|charge|transaction|giá trị|giá\s+trị)\s+[^0-9]{0,50}?(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\b", 1),
-        // Pattern 6: XX.XX (generic - last resort)
-        (r"(?i)\b(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\b", 1),
+        // Pattern 3: USD XX.XX format
+        (r"(?i)(?:USD|EUR|GBP|JPY|AUD|CAD)\s*([\d,]+\.?\d{2})\b", 1),
+        // Pattern 4: XX.XX (currency symbol might be elsewhere)
+        (r"(?i)\b(\d{1,3}(?:,\d{3})*\.\d{2})\b", 1),
         // Pattern 5: Debit/Credit amount patterns
         (r"(?i)(?:debit|credit|charge)\s*(?:of|amount)?\s*[:=]?\s*[$€£¥]?\s*([\d,]+\.?\d{2})", 1),
         // Pattern 6: Transaction for $XX.XX
@@ -208,26 +196,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
     ];
     
     let mut amount: Option<f64> = None;
-    let mut currency = "USD".to_string(); // Default currency
-    let mut bank = "Unknown".to_string(); // Default bank
     
-    // First, try to detect bank from email
-    let body_lower = body.to_lowercase();
-    if body_lower.contains("vib") || body_lower.contains("vibvn") || body_lower.contains("vietnam international bank") {
-        bank = "VIB".to_string();
-    } else if body_lower.contains("chase") {
-        bank = "Chase".to_string();
-    } else if body_lower.contains("paypal") {
-        bank = "PayPal".to_string();
-    } else if body_lower.contains("bank of america") || body_lower.contains("bofa") {
-        bank = "Bank of America".to_string();
-    } else if body_lower.contains("wells fargo") {
-        bank = "Wells Fargo".to_string();
-    } else if body_lower.contains("capital one") {
-        bank = "Capital One".to_string();
-    }
-    
-    // Try to extract amount with currency
     for (pattern, group) in patterns {
         if let Ok(re) = Regex::new(pattern) {
             if let Some(caps) = re.captures(&body) {
@@ -235,78 +204,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
                     let cleaned = amount_str.as_str().replace(',', "");
                     if let Ok(parsed_amount) = cleaned.parse::<f64>() {
                         amount = Some(parsed_amount);
-                        
-                        // Determine currency based on pattern match
-                        let full_match = caps.get(0).unwrap().as_str().to_lowercase();
-                        if full_match.contains("vnd") {
-                            currency = "VND".to_string();
-                        } else if full_match.contains("€") || full_match.contains("eur") {
-                            currency = "EUR".to_string();
-                        } else if full_match.contains("£") || full_match.contains("gbp") {
-                            currency = "GBP".to_string();
-                        } else if full_match.contains("¥") || full_match.contains("jpy") {
-                            currency = "JPY".to_string();
-                        } else if full_match.contains("usd") {
-                            currency = "USD".to_string();
-                        } else if full_match.contains("$") {
-                            currency = "USD".to_string(); // $ usually means USD
-                        }
-                        // If no currency detected but bank is VIB, assume VND
-                        else if bank == "VIB" {
-                            currency = "VND".to_string();
-                        }
-                        
                         break;
-                    }
-                }
-            }
-        }
-    }
-    
-    // Try to extract transaction ID from VIB bank emails
-    let mut transaction_id: Option<String> = None;
-    
-    // Common patterns for VIB transaction IDs
-    let transaction_id_patterns = vec![
-        r"Mã\s*giao\s*dịch\s*[:=]\s*([A-Z0-9]+)",
-        r"Mã\s*GD\s*[:=]\s*([A-Z0-9]+)",
-        r"Transaction\s*ID\s*[:=]\s*([A-Z0-9]+)",
-        r"Ref\.\s*([A-Z0-9]+)",
-        r"Reference\s*[:=]\s*([A-Z0-9]+)",
-        r"ID\s*[:=]\s*([A-Z0-9]+)",
-        r"Số\s*giao\s*dịch\s*[:=]\s*([A-Z0-9]+)",
-        r"GD\s*([0-9]+)",
-        r"#([0-9]+)",
-    ];
-    
-    for pattern in transaction_id_patterns {
-        if let Ok(re) = Regex::new(pattern) {
-            if let Some(caps) = re.captures(&body) {
-                if let Some(id_match) = caps.get(1) {
-                    transaction_id = Some(id_match.as_str().to_string());
-                    break;
-                }
-            }
-        }
-    }
-    
-    // If no transaction ID found, try to extract from email subject
-    if transaction_id.is_none() {
-        if let Some(subject) = parsed.headers.get_first_value("Subject") {
-            // Look for patterns like "GD123456" in subject
-            let subject_patterns = vec![
-                r"GD\s*([0-9]+)",
-                r"#([0-9]+)",
-                r"\[([A-Z0-9]+)\]",
-            ];
-            
-            for pattern in subject_patterns {
-                if let Ok(re) = Regex::new(pattern) {
-                    if let Some(caps) = re.captures(&subject) {
-                        if let Some(id_match) = caps.get(1) {
-                            transaction_id = Some(id_match.as_str().to_string());
-                            break;
-                        }
                     }
                 }
             }
@@ -320,9 +218,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
     
     // Enhanced transaction type detection
     let body_lower = body.to_lowercase();
-    let r#type = if body_lower.contains("paid you") ||
-                   body_lower.contains("sent you") ||
-                   body_lower.contains("credited") || 
+    let r#type = if body_lower.contains("credited") || 
                    body_lower.contains("credit") ||
                    body_lower.contains("deposit") ||
                    body_lower.contains("received") ||
@@ -337,15 +233,9 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
                    body_lower.contains("direct deposit") ||
                    body_lower.contains("wire received") ||
                    body_lower.contains("transfer received") ||
-                   body_lower.contains("payroll") ||
-                   // Vietnamese keywords for incoming money
-                   body_lower.contains("nhận được") ||
-                   body_lower.contains("đã nhận") ||
-                   body_lower.contains("chuyển vào") {
+                   body_lower.contains("payroll") {
         "in".to_string()
-    } else if body_lower.contains("you paid") ||
-              body_lower.contains("you sent") ||
-              body_lower.contains("debited") || 
+    } else if body_lower.contains("debited") || 
               body_lower.contains("debit") ||
               body_lower.contains("withdrawal") ||
               body_lower.contains("purchase") ||
@@ -357,12 +247,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
               body_lower.contains("transfer to") ||
               body_lower.contains("withdrawn") ||
               body_lower.contains("declined") ||
-              body_lower.contains("authorized") ||
-              // Vietnamese keywords for outgoing money
-              body_lower.contains("thanh toán") ||
-              body_lower.contains("giao dịch") ||
-              body_lower.contains("chuyển đi") ||
-              body_lower.contains("trừ tiền") {
+              body_lower.contains("authorized") {
         "out".to_string()
     } else {
         if amount > 0.0 && (body_lower.contains("refund") || body_lower.contains("reversal")) {
@@ -397,8 +282,6 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
         r"(?i)(\d{1,2}\.\d{1,2}\.\d{4})",
         // Chase date format
         r"(?i)(?:on|from|posted)\s+(\w+ \d{1,2},? \d{4})",
-        // Vietnamese date format with time (e.g., "08:51 03/03/2026")
-        r"(?i)(?:\d{2}:\d{2}\s+)?(\d{2}/\d{2}/\d{4})",
         // Relative dates
         r"(?i)\b(today|yesterday)\b",
     ];
@@ -421,17 +304,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
                     }
                     
                     // Try different date formats
-                    let formats = ["%m/%d/%Y", "%d/%m/%Y", "%Y-%m-%d", "%m-%d-%Y", "%d-%m-%Y", "%b %d, %Y", "%B %d, %Y", "%d %b %Y", "%d %B %Y", "%m/%d/%y", "%d/%m/%y"];
-                    for fmt in formats {
-                        if let Ok(parsed) = NaiveDate::parse_from_str(&date_text, fmt) {
-                            date = parsed;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
+
     
     // Extract description
     let description_patterns = vec![
@@ -453,16 +326,6 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
         r"(?i)paid\s+(?:to|for)\s*(.+?)(?:\n|$)",
         // Card transaction
         r"(?i)Card\s+(?:purchase|transaction)\s+(?:at|with)?\s*(.+?)(?:\n|$)",
-        // Venmo/Cash App specific
-        r"(?i)note\s*[:=]\s*(.+?)(?:\n|$)",
-        r"(?i)memo\s*[:=]\s*(.+?)(?:\n|$)",
-        r"(?i)for\s*[:=]\s*(.+?)(?:\n|$)",
-        // Vietnamese bank patterns
-        r"(?i)tại\s*(.+?)(?:\n|$)",
-        r"(?i)merchant\s*[:=]\s*(.+?)(?:\n|$)",
-        r"(?i)cửa hàng\s*[:=]\s*(.+?)(?:\n|$)",
-        r"(?i)địa điểm\s*[:=]\s*(.+?)(?:\n|$)",
-        r"(?i)nơi\s*(?:giao dịch|thanh toán)\s*[:=]\s*(.+?)(?:\n|$)",
     ];
     
     let mut description = if r#type == "in" {
@@ -493,7 +356,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
         .trim()
         .to_string();
     
-    Some(Transaction::from_email(date, description, amount, currency, r#type, bank, transaction_id, email_message_id))
+    Some(Transaction::from_email(date, description, amount, r#type))
 }
 
 fn extract_email_body(parsed_mail: &ParsedMail) -> String {
@@ -562,7 +425,7 @@ fn get_decoded_content(parsed_mail: &ParsedMail) -> String {
                 decode_quoted_printable(&body)
             }
             _ => {
-                body.as_bytes().to_vec()
+                body
             }
         };
         
@@ -578,22 +441,12 @@ fn get_decoded_content(parsed_mail: &ParsedMail) -> String {
 }
 
 fn decode_base64(input: &str) -> Vec<u8> {
-    // Remove any trailing .= or other non-base64 characters
     let cleaned = input
-        .lines()
-        .map(|line| {
-            // Split line at .= if present
-            if let Some(pos) = line.find(".=") {
-                &line[..pos]
-            } else {
-                line
-            }
-        })
-        .map(|line| line.trim())
-        .filter(|line| !line.is_empty())
-        .collect::<Vec<_>>()
-        .join("");
+        .chars()
+        .filter(|c| !c.is_whitespace())
+        .collect::<String>();
     
+    use base64::Engine;
     base64::engine::general_purpose::STANDARD.decode(&cleaned).unwrap_or_else(|_| input.as_bytes().to_vec())
 }
 
