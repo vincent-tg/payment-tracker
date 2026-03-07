@@ -10,8 +10,11 @@ WORKDIR /app
 # Copy source files
 COPY . .
 
-# Build the application
-RUN cargo build --release
+# Build the application using BuildKit cache mounts
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/app/target \
+    cargo build --release && \
+    cp /app/target/release/payment-tracker /tmp/payment-tracker
 
 # Runtime stage
 FROM alpine:3.19
@@ -27,7 +30,7 @@ RUN addgroup -g 1000 payment && \
 WORKDIR /app
 
 # Copy binary from builder
-COPY --from=builder /app/target/release/payment-tracker /app/payment-tracker
+COPY --from=builder /tmp/payment-tracker /app/payment-tracker
 COPY --from=builder /app/configs/config_example.toml /app/config_example.toml
 
 # Copy entrypoint script
