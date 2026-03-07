@@ -28,7 +28,7 @@ WORKDIR /app
 
 # Copy binary from builder
 COPY --from=builder /app/target/release/payment-tracker /app/payment-tracker
-COPY --from=builder /app/config_example.toml /app/config_example.toml
+COPY --from=builder /app/configs/config_example.toml /app/config_example.toml
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
@@ -48,4 +48,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 # Default command
-CMD ["/app/payment-tracker", "run"]
+CMD ["/app/payment-tracker", "serve"]
