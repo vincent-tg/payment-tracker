@@ -1,0 +1,47 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Configuration
+config.toml
+.env
+*.db
+
+# Temporary files
+tmp/
+temp/
+
+# Build artifacts
+dist/
+*.tar.gz
+*.zip
+
+# Docker
+.dockerignore
+
+# Kubernetes
+kubeconfig
+
+# Test artifacts
+coverage/
+*.profraw
+
+# Documentation
+_site/
+.sass-cache/
+.jekyll-cache/

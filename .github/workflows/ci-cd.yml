@@ -1,0 +1,152 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 8 * * *'  # Daily at 8 AM
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  SUPABASE_CONNECTION_STRING: ${{ secrets.SUPABASE_CONNECTION_STRING }}
+
+jobs:
+  test:
+    runs-on: [self-hosted, k3s, linux, arm64]
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Rust
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+    
+    - name: Cache dependencies
+      uses: Swatinem/rust-cache@v2
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libssl-dev pkg-config build-essential
+
+    - name: Run tests
+      run: cargo test --verbose
+    
+    - name: Run clippy
+      run: cargo clippy
+    
+    - name: Check formatting
+      run: cargo fmt -- --check
+
+  build-and-push:
+    needs: test
+    runs-on: [self-hosted, k3s, linux, arm64]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        platforms: linux/arm64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Verify k3s kubectl access
+      run: |
+        kubectl get nodes
+        kubectl cluster-info
+    
+    - name: Deploy to k3s
+      run: |
+        # Create supabase secret from Github Secrets
+        kubectl create secret generic supabase-secret \
+          --from-literal=url="${{ env.SUPABASE_CONNECTION_STRING }}" \
+          -n default --dry-run=client -o yaml | kubectl apply -f -
+          
+        # Apply configs and deployment architecture first
+        kubectl apply -f k8s/payment-tracker.yaml -n default
+        
+        # Update existing/new deployment with the latest image built from GHCR
+        kubectl set image deployment/payment-tracker payment-tracker=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest -n default
+        
+        # Wait for the Kubernetes rollout to finish
+        kubectl rollout status deployment/payment-tracker -n default --timeout=300s
+        
+        echo "✅ Deployment successful!"
+    
+    - name: Verify deployment
+      run: |
+        kubectl get pods -n default
+        kubectl get deployments -n default
+        kubectl get cronjobs -n default
+
+  daily-track:
+    runs-on: [self-hosted, k3s, linux, arm64]
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Verify k3s kubectl access
+      run: |
+        kubectl get nodes
+        kubectl cluster-info
+    
+    - name: Trigger daily tracking job
+      run: |
+        # Create a manual job run
+        kubectl create job --from=cronjob/payment-tracker-daily payment-tracker-daily-manual-$(date +%s) -n default
+        
+        # Wait for completion
+        sleep 30
+        
+        # Get logs from the job
+        kubectl get pods -n default --selector=job-name --sort-by=.metadata.creationTimestamp | tail -1 | awk '{print $1}' | xargs kubectl logs -n default
+        
+        echo "✅ Daily tracking job completed!"

@@ -1,0 +1,709 @@
+Delivered-To: baotg.fin@gmail.com
+Received: by 2002:a05:651c:b08:b0:389:ecc3:6b8a with SMTP id b8csp1428074ljr;
+        Mon, 2 Mar 2026 07:03:59 -0800 (PST)
+X-Received: by 2002:ac8:59d3:0:b0:506:2048:36c9 with SMTP id d75a77b69052e-507522c1c0amr162935861cf.1.1772463839626;
+        Mon, 02 Mar 2026 07:03:59 -0800 (PST)
+ARC-Seal: i=2; a=rsa-sha256; t=1772463839; cv=pass;
+        d=google.com; s=arc-20240605;
+        b=jD0rlqPmixQFq0BO2ZB7Ub+Yd3foqcUrn7PpwXrWihNbnE3/TZ+cVTkMMYwin1HzVS
+         ynm8OGbu1zcoAIQbgn+pN6wITYutzRFqA+AKxTQL+1jW5ka3gXPAFBWC4c3j23LcA6UF
+         wun7aHap15yCBeqCASDoPRNoQO6rf4cL/DuZv3XBf62Rl//2eiD8+bxgd5ueVuwn5jIL
+         kAYfh80fr6u4Bltj6TDck3L+ENhBwtcWFhSHDppoN7DqCjWM9QIwbaSM12+dD5QpZZ5H
+         MpGawPr9+HEqQsS5YGlkgwyQ7+Ur/8rsojzmQd1akYLTJ/Bmztt9zCo2dkIMwV8VIPal
+         dvIQ==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :dkim-signature;
+        bh=5Cnp7PtPA/+/ELZ93AWydlD38d5ZcA00zploXbgxACI=;
+        fh=Jepm7S49mmYeIwBr0PCJulZmXYpfXLnJeLfWy88gQmE=;
+        b=ETxCBPrkx/pk9XLxa+gQGh/Kzv/UI8LDo3eKfPEcM6AamOb4LjO3FwdlZxEgTu0xVq
+         p02i4Ue8JyHlEQGiE4hedThqk0MA9t7Ki2u0x/CX2c2phmk39S/NqJOw3FHUvhr35CHx
+         WPldbz7IjWwMKlImwVmQUvhdiKcGB5ImslyeILznDIxhkmsq81j2XYAWg5eiJS2Jg816
+         WujgNbmGEDG7zZ7kIbRI5rQ3gzSSOrWCME5eY8v8T9tVOzivfElpQex19cY7JOUywPJm
+         Sh87ZHAWHC/EvhjMFRWz1ZN+osirOeYBhe5kw1Ke2q7RH8Q9KpEklcC+EGY/ztIELIkS
+         CvPQ==;
+        dara=google.com
+ARC-Authentication-Results: i=2; mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=WoigjhUP;
+       arc=pass (i=1);
+       spf=pass (google.com: domain of baotg.it@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=baotg.it@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+Return-Path: <baotg.it@gmail.com>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id d75a77b69052e-50744ba4d86sor66457401cf.5.2026.03.02.07.03.55
+        for <baotg.fin@gmail.com>
+        (Google Transport Security);
+        Mon, 02 Mar 2026 07:03:59 -0800 (PST)
+Received-SPF: pass (google.com: domain of baotg.it@gmail.com designates 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@gmail.com header.s=20230601 header.b=WoigjhUP;
+       arc=pass (i=1);
+       spf=pass (google.com: domain of baotg.it@gmail.com designates 209.85.220.41 as permitted sender) smtp.mailfrom=baotg.it@gmail.com;
+       dmarc=pass (p=NONE sp=QUARANTINE dis=NONE) header.from=gmail.com;
+       dara=pass header.i=@gmail.com
+ARC-Seal: i=1; a=rsa-sha256; t=1772463835; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DInsPfwe3Dj+2hqvbpbV7UGPkogYWsWRjZRypibE0G7hmMHaGiOmsBYxlQ78MbJA1d
+         r3baUt10MU/ceNEDCL2YpJtB+ixp/2NxfbJabf9gkYjiCJYroIfKi0+TbdfDq4mg1Z7A
+         vY9kT029K2L7N1YexMHuDP3s4oUEMLw+mXWHCP2HFUur5HAv/bw0Eaz680dEL5d+ePqe
+         XlMrgXZs/LEpjeGimEYCPRkkggxb4oxZ2oyXhZIT3fTMuQRgPQgkxywQdHiRmJJOekcR
+         Xj4REiPyl1PexHBqnYvWmvbhEIc5ovpE0c/lqbUn53ydvKnPTxYy4pK2Yf56jBYvRskz
+         Ymxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :dkim-signature;
+        bh=5Cnp7PtPA/+/ELZ93AWydlD38d5ZcA00zploXbgxACI=;
+        fh=Jepm7S49mmYeIwBr0PCJulZmXYpfXLnJeLfWy88gQmE=;
+        b=OurMPJwSpcySygkr4vwD5RECSAtbe58D/FjjuJEEpKIfShKeoGr9ZjlubsNs9wfjFe
+         Kpy7h6HeHWc6PIySLReYSMItVBcOy+VDT0avg6OKEywFBch27hrORfh3Up5ruL49KY4T
+         cVJwi6COU8h5JYibTm7xeRKx1Kc6gVbO2wGwiiYwaK805hqyDb2AA7MtbWtUiCm5ITq5
+         Xm803AdXDH4P54DvQcANsN/eTY72VJokwhxIQdUHBuEO93E6SNgr0okRMKSaBGD6BOot
+         1XqFpArzJQhL3rdkAKM3mfY+WM5XtaZ3YEvX2QOaIzBc4fdSMYezyxN59NnTxnBmkI4q
+         HQjg==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772463835; x=1773068635; dara=google.com;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5Cnp7PtPA/+/ELZ93AWydlD38d5ZcA00zploXbgxACI=;
+        b=WoigjhUPoaC+1il07CGelejxkqUTFJGHgkSXwE4znvUtafTbOSZTVsuHg5Ubc/qVGk
+         rvrBxHbmeqllNcALw/tHem7oPLg6obeIQzD3GrYPIo8ACEwTJEll0LavDBg/UmTTF98v
+         CVcXC/AhZ6dk5k8jx/XIH7O1l91S3p4plyOFsY3Nz/gUNo1/zGmg+A9TAdwOEpLSp9Pf
+         +cgck8n0kFmRiNqLmAe7j1LpHjZs1BXiT/W5LhFyjEUQahZa1Ut/5RfU/fSIwouoNsnP
+         Rbe5/+ibuFyEIAR3ru9n6j+z3tQgJFYfCjQ3bTQ+F00W3OsN8rejM+PEAhoHLU2ik8VZ
+         z6+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772463835; x=1773068635;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5Cnp7PtPA/+/ELZ93AWydlD38d5ZcA00zploXbgxACI=;
+        b=qQUDbLQgmsuSzlTRoRRC3THFrmiaWeRP/JC3lccUXIwjABdS2dwzFLyufNG9lBMQ/5
+         fCrJUgtoZAeodGTmtKsLNog9f2UmYs1pUQ8jkBuXoFRpE3xEScDLgVqQ6UFFtfS2MvCE
+         DlMxwMjgp4Bt+ZwQ/3Zu4pMTN8O1+bX1DHXVP2UDKkGNTkGysyALhKqHbi7yYEnexBCQ
+         IK7QT8qQGw3J+wEPZLfel0QGljOZNVSGXvwYnwwKXoPdTFULKYO06AtBvuKqSozruvEx
+         6l/ALU6Kz/SlE3ULp+DbL21play6FQyfTKBxcEPJOsPYRB6V9v7pLqDNRW6KI57uoPlD
+         ZudQ==
+X-Gm-Message-State: AOJu0YyzMXBBsmGhq9hK11tWanlNbIndHkSD0ShKxaemZhFdilHRfg8S
+	4PWVZwSivQDT7ygzxkxMOq1rIPJn16MUyUIEbqzraTt4zFh0/xisV/yjwMQEbE/FjUzvgAAPti9
+	kd8h0iIL5av77zLGHB7dgOlWHzHW1cYR5mQ==
+X-Gm-Gg: ATEYQzzZDLee3A8fTKfeuGsa8cBGsp692rZ1DMGuFV80TB9UpCO+AYI+BF/jxac3N6Z
+	bxnmqz1sJjt9DqA92LQdWW2YrN20TxMoykSRROyUVUq9VMiDATQSxQXtdfDnPDwgpzFYUX66YrJ
+	fwMgun158lz0qBIus+ugb6exoWvIREebIQPHGZ3dWdcxfgcMWLmazuUPRpLTOMDQpyPsjPoXSct
+	H2Mxltn7olR2rpHLi51eEmbXOm6TN4yQWWnO00vn6Nz1fVsKkCPCVGxOIjWxWVY1rDClPv18NXA
+	8tuiB38=
+X-Received: by 2002:a05:622a:346:b0:4ff:b32b:cdf9 with SMTP id
+ d75a77b69052e-5075231eb25mr150981061cf.14.1772463834493; Mon, 02 Mar 2026
+ 07:03:54 -0800 (PST)
+MIME-Version: 1.0
+References: <1731361525.368317845.1771576509927@email.apple.com>
+In-Reply-To: <1731361525.368317845.1771576509927@email.apple.com>
+From: Bao Tran Gia <baotg.it@gmail.com>
+Date: Mon, 2 Mar 2026 22:03:49 +0700
+X-Gm-Features: AaiRm52r6-fHpU-TIl5oLgh3_sBPUykroq_t1h9nhTQ0p28ps6wfHbkfEimcdBk
+Message-ID: <CADb14mX_vAHT9Zr8f4O8-QdSv2BD1piSQ05EmzehLQQUhRApsA@mail.gmail.com>
+Subject: =?UTF-8?B?RndkOiBCacOqbiBuaOG6rW4gY+G7p2EgYuG6oW4gdOG7qyBBcHBsZQ==?=
+To: "baotg.fin@gmail.com" <baotg.fin@gmail.com>
+Content-Type: multipart/alternative; boundary="0000000000003b78ed064c0be534"
+
+--0000000000003b78ed064c0be534
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+---------- Forwarded message ---------
+From: Apple <no_reply@email.apple.com>
+Date: Fri, Feb 20, 2026 at 3:35=E2=80=AFPM
+Subject: Bi=C3=AAn nh=E1=BA=ADn c=E1=BB=A7a b=E1=BA=A1n t=E1=BB=AB Apple
+To: <baotg.it@gmail.com>
+
+
+
+
+[image: Apple] Bi=C3=AAn Nh=E1=BA=ADn
+
+T=C3=80I KHO=E1=BA=A2N APPLE
+baotg.it@gmail.com XU=E1=BA=A4T H=C3=93A =C4=90=C6=A0N =C4=90=E1=BA=BEN
+MasterCard .... 3021
+Tran Gia Bao
+9D Nguyen Huu Tho
+Ho Chi Minh, 70000
+VNM
+NG=C3=80Y
+20/02/2026
+ID =C4=90=C6=A0N H=C3=80NG
+MX5X512B75
+<https://support.apple.com/en-vn/HT204088?cid=3Demail_receipt_itunes_articl=
+e_HT204088>
+S=E1=BB=90
+T=C3=80I LI=E1=BB=86U
+708094616717
+App Store
+TikTok
+70 Coins
+Mua In-App
+Gia Bao=E2=80=99s iPhone
+B=C3=A1o c=C3=A1o l=E1=BB=97i
+<https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/reportAProblem?a=
+=3D6742110361&cc=3Dvn&d=3D20733206836&l=3Dvi&o=3Di&p=3D110055490252777&pli=
+=3D110072882330968&s=3D1>
+31.000=C4=91
+
+T=E1=BB=94NG C=E1=BB=98NG 31.000=C4=91
+
+
+Nh=E1=BA=ADn tr=E1=BB=A3 gi=C3=BAp v=E1=BB=81 =C4=91=C4=83ng k=C3=BD v=C3=
+=A0 m=E1=BB=A5c mua. Truy C=E1=BA=ADp Trang H=E1=BB=97 Tr=E1=BB=A3 Apple
+<https://support.apple.com/en-vn/billing?cid=3Demail_receipt>. T=C3=ACm hi=
+=E1=BB=83u c=C3=A1ch qu=E1=BA=A3n
+l=C3=BD t=C3=B9y ch=E1=BB=8Dn m=E1=BA=ADt kh=E1=BA=A9u
+<https://support.apple.com/kb/HT204030?cid=3Demail_receipt_itunes_article_H=
+T204030>
+cho c=C3=A1c m=E1=BB=A5c mua tr=C3=AAn iTunes, Apple Books v=C3=A0 App Stor=
+e.
+
+ID Apple b=C3=A2y gi=E1=BB=9D l=C3=A0 T=C3=A0i kho=E1=BA=A3n Apple. B=E1=BA=
+=A1n v=E1=BA=ABn c=C3=B3 th=E1=BB=83 =C4=91=C4=83ng nh=E1=BA=ADp b=E1=BA=B1=
+ng c=C3=B9ng =C4=91=E1=BB=8Ba
+ch=E1=BB=89 email ho=E1=BA=B7c s=E1=BB=91 =C4=91i=E1=BB=87n tho=E1=BA=A1i v=
+=C3=A0 m=E1=BA=ADt kh=E1=BA=A9u.
+
+[image: Apple] [image: Apple]
+
+T=C3=A0i kho=E1=BA=A3n Apple
+<https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/accountSummary?mt=
+=3D8>
+ =E2=80=A2 =C4=90i=E1=BB=81u kho=E1=BA=A3n b=C3=A1n h=C3=A0ng
+<https://www.apple.com/legal/internet-services/itunes/vn/terms.html#SALE>
+=E2=80=A2 Ch=C3=ADnh
+s=C3=A1ch quy=E1=BB=81n ri=C3=AAng t=C6=B0 <https://www.apple.com/legal/pri=
+vacy/vn/>
+
+B=E1=BA=A3n quy=E1=BB=81n =C2=A9 2026 Apple Distribution International Ltd.
+Gi=E1=BB=AF to=C3=A0n quy=E1=BB=81n <https://www.apple.com/asia/legal/>
+Hollyhill Industrial Estate, Hollyhill, Cork, Ireland.
+
+[image: Apple] Bi=C3=AAn Nh=E1=BA=ADn
+
+T=C3=80I KHO=E1=BA=A2N APPLE
+baotg.it@gmail.com
+ID =C4=90=C6=A0N H=C3=80NG
+MX5X512B75 S=E1=BB=90 T=C3=80I LI=E1=BB=86U
+708094616717
+NG=C3=80Y
+20/02/2026
+XU=E1=BA=A4T H=C3=93A =C4=90=C6=A0N =C4=90=E1=BA=BEN
+MasterCard .... 3021
+Tran Gia Bao
+9D Nguyen Huu Tho
+Ho Chi Minh, 70000
+VNM
+App Store
+TikTok
+70 Coins
+Mua In-App
+Gia Bao=E2=80=99s iPhone
+B=C3=A1o c=C3=A1o l=E1=BB=97i
+<https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/reportAProblem?a=
+=3D6742110361&cc=3Dvn&d=3D20733206836&l=3Dvi&o=3Di&p=3D110055490252777&pli=
+=3D110072882330968&s=3D1>
+31.000=C4=91
+
+T=E1=BB=94NG C=E1=BB=98NG 31.000=C4=91
+
+
+Nh=E1=BA=ADn tr=E1=BB=A3 gi=C3=BAp v=E1=BB=81 =C4=91=C4=83ng k=C3=BD v=C3=
+=A0 m=E1=BB=A5c mua. Truy C=E1=BA=ADp Trang H=E1=BB=97 Tr=E1=BB=A3 Apple
+<https://support.apple.com/en-vn/billing?cid=3Demail_receipt>. T=C3=ACm hi=
+=E1=BB=83u c=C3=A1ch qu=E1=BA=A3n
+l=C3=BD t=C3=B9y ch=E1=BB=8Dn m=E1=BA=ADt kh=E1=BA=A9u
+<https://support.apple.com/kb/HT204030?cid=3Demail_receipt_itunes_article_H=
+T204030>
+cho c=C3=A1c m=E1=BB=A5c mua tr=C3=AAn iTunes, Apple Books v=C3=A0 App Stor=
+e.
+
+ID Apple b=C3=A2y gi=E1=BB=9D l=C3=A0 T=C3=A0i kho=E1=BA=A3n Apple. B=E1=BA=
+=A1n v=E1=BA=ABn c=C3=B3 th=E1=BB=83 =C4=91=C4=83ng nh=E1=BA=ADp b=E1=BA=B1=
+ng c=C3=B9ng =C4=91=E1=BB=8Ba
+ch=E1=BB=89 email ho=E1=BA=B7c s=E1=BB=91 =C4=91i=E1=BB=87n tho=E1=BA=A1i v=
+=C3=A0 m=E1=BA=ADt kh=E1=BA=A9u.
+
+
+T=C3=A0i kho=E1=BA=A3n Apple
+<https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/accountSummary?mt=
+=3D8>
+ =E2=80=A2 =C4=90i=E1=BB=81u kho=E1=BA=A3n b=C3=A1n h=C3=A0ng
+<https://www.apple.com/legal/internet-services/itunes/vn/terms.html#SALE>
+=E2=80=A2 Ch=C3=ADnh
+s=C3=A1ch quy=E1=BB=81n ri=C3=AAng t=C6=B0 <https://www.apple.com/legal/pri=
+vacy/vn/>
+
+B=E1=BA=A3n quy=E1=BB=81n =C2=A9 2026 Apple Distribution International Ltd.
+Gi=E1=BB=AF to=C3=A0n quy=E1=BB=81n <https://www.apple.com/asia/legal/>
+Hollyhill Industrial Estate, Hollyhill, Cork, Ireland.
+
+--0000000000003b78ed064c0be534
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br><div class=3D"gmail_quote gmail_quote_container"><=
+div dir=3D"ltr" class=3D"gmail_attr">---------- Forwarded message ---------=
+<br>From: <strong class=3D"gmail_sendername" dir=3D"auto">Apple</strong> <s=
+pan dir=3D"auto">&lt;<a href=3D"mailto:no_reply@email.apple.com">no_reply@e=
+mail.apple.com</a>&gt;</span><br>Date: Fri, Feb 20, 2026 at 3:35=E2=80=AFPM=
+<br>Subject: Bi=C3=AAn nh=E1=BA=ADn c=E1=BB=A7a b=E1=BA=A1n t=E1=BB=AB Appl=
+e<br>To:  &lt;<a href=3D"mailto:baotg.it@gmail.com">baotg.it@gmail.com</a>&=
+gt;<br></div><br><br>
+
+ =20
+ =20
+ =20
+
+<div bgcolor=3D"#ffffff" link=3D"#3366cc" vlink=3D"#3366cc" alink=3D"#3366c=
+c" marginheight=3D"0" marginwidth=3D"0" style=3D"margin:0;padding:0">
+ =20
+  <br><br>
+  <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" align=3D"center" =
+style=3D"border-collapse:collapse;border-spacing:0">
+    <tbody><tr>
+      <td valign=3D"top">
+        <div style=3D"display:block;padding:0;margin:0;height:100%;max-heig=
+ht:none;min-height:none;line-height:normal;overflow:visible">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" align=3D"center" st=
+yle=3D"border-collapse:collapse;border-spacing:0;width:742px">
+  <tbody><tr>
+    <td style=3D"width:50px"></td>
+    <td>
+<img width=3D"42" height=3D"42" alt=3D"Apple" src=3D"https://s.mzstatic.com=
+/email/images_shared/logo_apple_d-2x.png" border=3D"0" style=3D"border:none=
+;padding:0;margin:0">
+    </td>
+    <td align=3D"right" style=3D"font-size:32px;font-weight:300;font-family=
+:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(136,136,136)=
+">Bi=C3=AAn Nh=E1=BA=ADn</td>
+    <td style=3D"width:50px"></td>
+  </tr>
+  <tr height=3D"20"><td colspan=3D"4">=C2=A0</td></tr><tr>
+  </tr><tr>
+    <td colspan=3D"4" align=3D"center">
+<table border=3D"0" cellspacing=3D"0" cellpadding=3D"0" width=3D"660" style=
+=3D"border-collapse:collapse;border-spacing:0">
+  <tbody><tr>
+    <td>
+      <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"bord=
+er-collapse:collapse;border-spacing:0;color:rgb(51,51,51);background-color:=
+rgb(250,250,250);border-radius:3px;font-size:12px;font-family:&#39;Helvetic=
+a Neue&#39;,Helvetica,Arial,sans-serif">
+        <tbody><tr height=3D"46">
+          <td width=3D"320" colspan=3D"2" style=3D"padding-left:20px;border=
+-style:solid;border-color:white;border-left-width:0;border-right-width:1px;=
+border-bottom-width:1px;border-top-width:0px"><span style=3D"color:rgb(102,=
+102,102);font-size:10px">
+T=C3=80I=C2=A0KHO=E1=BA=A2N=C2=A0APPLE</span><br><a href=3D"mailto:baotg.it=
+@gmail.com" target=3D"_blank">baotg.it@gmail.com</a>
+          </td>
+          <td width=3D"340" rowspan=3D"3" style=3D"padding-left:20px;border=
+-style:solid;border-color:white;border-left-width:0px;border-right-width:0p=
+x;border-top-width:0px;border-bottom-width:0px">
+            <span style=3D"color:rgb(102,102,102);font-size:10px">XU=E1=BA=
+=A4T H=C3=93A =C4=90=C6=A0N =C4=90=E1=BA=BEN</span><br>
+MasterCard .... 3021<br>Tran  Gia Bao<br>
+9D Nguyen Huu Tho<br>Ho Chi Minh, 70000<br>VNM          </td>
+        </tr>
+        <tr height=3D"46">
+          <td colspan=3D"2" style=3D"padding-left:20px;border-style:solid;b=
+order-color:white;border-left-width:0;border-right-width:1px;border-bottom-=
+width:1px;border-top-width:0px"><span style=3D"color:rgb(102,102,102);font-=
+size:10px">NG=C3=80Y</span><br><span dir=3D"auto">20/02/2026</span></td>
+        </tr>
+        <tr height=3D"46">
+          <td style=3D"padding-left:20px;border-style:solid;border-color:wh=
+ite;border-left-width:0;border-right-width:1px;border-bottom-width:0px;bord=
+er-top-width:0px"><span style=3D"color:rgb(102,102,102);font-size:10px">ID =
+=C4=90=C6=A0N H=C3=80NG</span><br><span style=3D"color:#0070c9"><a href=3D"=
+https://support.apple.com/en-vn/HT204088?cid=3Demail_receipt_itunes_article=
+_HT204088" rel=3D"nofollow noopener" target=3D"_blank">MX5X512B75</a></span=
+></td>
+          <td style=3D"padding-left:20px;border-style:solid;border-color:wh=
+ite;border-left-width:0;border-right-width:1px;border-bottom-width:0px;bord=
+er-top-width:0px"><span style=3D"color:rgb(102,102,102);font-size:10px">S=
+=E1=BB=90 T=C3=80I LI=E1=BB=86U</span><br>708094616717</td>
+        </tr>
+      </tbody></table>
+    </td>
+  </tr>
+
+  <tr height=3D"30"><td></td></tr>
+  <tr>
+    <td>
+      <table width=3D"660" border=3D"0" cellpadding=3D"0" cellspacing=3D"0"=
+ style=3D"border-collapse:collapse;border-spacing:0;width:660px;color:rgb(5=
+1,51,51);font-size:12px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Aria=
+l,sans-serif">
+        <tbody><tr height=3D"24" style=3D"background-color:rgb(250,250,250)=
+">
+          <td colspan=3D"3" width=3D"350" style=3D"width:350px;padding-left=
+:10px;border-top-left-radius:3px;border-bottom-left-radius:3px"><span style=
+=3D"font-size:14px;font-weight:500">App Store</span></td>
+        </tr>
+  <tr height=3D"15"><td colspan=3D"3"></td></tr>
+  <tr style=3D"max-height:114px">
+    <td width=3D"64" align=3D"center" valign=3D"top" style=3D"padding:0 0 0=
+ 20px;margin:0;width:64px">
+      <img src=3D"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/09/=
+a8/00/09a8007a-2633-f5e3-72e6-46118e721e3b/AppIcon_TikTok-0-0-1x_U007epad-0=
+-1-0-0-85-220.png/128x128bb.jpg" width=3D"64" height=3D"64" border=3D"0" al=
+t=3D"" style=3D"padding:0;margin:0;border-radius:14px;border:1px solid rgba=
+(128,128,128,0.2)">
+    </td>
+    <td style=3D"padding:0 0 0 20px;line-height:15px">
+      <span dir=3D"auto" style=3D"font-weight:600">
+TikTok
+      </span><br>
+<span style=3D"color:rgb(102,102,102)">70 Coins</span><br>        <span sty=
+le=3D"color:rgb(102,102,102)">
+Mua In-App        </span><br>
+<span style=3D"color:rgb(102,102,102)">Gia Bao=E2=80=99s iPhone</span><br> =
+     <a style=3D"font-size:10px">
+</a><a href=3D"https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/rep=
+ortAProblem?a=3D6742110361&amp;cc=3Dvn&amp;d=3D20733206836&amp;l=3Dvi&amp;o=
+=3Di&amp;p=3D110055490252777&amp;pli=3D110072882330968&amp;s=3D1" style=3D"=
+color:#0070c9" target=3D"_blank">B=C3=A1o c=C3=A1o l=E1=BB=97i</a>     =20
+    </td>
+    <td width=3D"100" align=3D"right" valign=3D"top" style=3D"padding:0 20p=
+x 0 0;width:100px">
+      <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" style=3D"bord=
+er-collapse:collapse;border-spacing:0;font-size:12px;font-family:inherit">
+        <tbody><tr><td align=3D"right" colspan=3D"3"><span style=3D"font-we=
+ight:600;white-space:nowrap">31.000=C4=91</span></td></tr>
+      </tbody></table>
+    </td>
+  </tr>
+      </tbody></table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width=3D"660" border=3D"0" cellpadding=3D"0" cellspacing=3D"0"=
+ style=3D"border-collapse:collapse;border-spacing:0;width:660px;color:rgb(5=
+1,51,51);font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif">
+        <tbody><tr height=3D"30"><td colspan=3D"3"></td></tr>
+        <tr height=3D"1"><td height=3D"1" colspan=3D"3" style=3D"padding:0 =
+10px 0 10px"><div style=3D"line-height:1px;height:1px;background-color:rgb(=
+238,238,238)"></div></td></tr>
+        <tr height=3D"48">
+          <td align=3D"right" style=3D"color:rgb(102,102,102);font-size:10p=
+x;font-weight:600;padding:0 30px 0 0;border-width:1px;border-color:rgb(238,=
+238,238)">T=E1=BB=94NG C=E1=BB=98NG</td>
+          <td width=3D"1" style=3D"background-color:rgb(238,238,238);width:=
+1px"></td>
+          <td width=3D"90" align=3D"right" style=3D"width:120px;padding:0 2=
+0px 0 0;font-size:16px;font-weight:600;white-space:nowrap">
+              31.000=C4=91
+          </td>
+        </tr>
+        <tr height=3D"1"><td height=3D"1" colspan=3D"3" style=3D"padding:0 =
+10px 0 10px"><div style=3D"line-height:1px;height:1px;background-color:rgb(=
+238,238,238)"></div></td></tr>
+      </tbody></table>
+    </td>
+  </tr>
+</tbody></table>
+  </td>
+</tr>
+<tr style=3D"height:20px"><td colspan=3D"4">=C2=A0</td></tr>
+<tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" style=3D"font-size:12px;font-family:&#=
+39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(102,102,102)">
+        Nh=E1=BA=ADn tr=E1=BB=A3 gi=C3=BAp v=E1=BB=81 =C4=91=C4=83ng k=C3=
+=BD v=C3=A0 m=E1=BB=A5c mua. <a href=3D"https://support.apple.com/en-vn/bil=
+ling?cid=3Demail_receipt" target=3D"_blank">Truy C=E1=BA=ADp Trang H=E1=BB=
+=97 Tr=E1=BB=A3 Apple</a>.
+    T=C3=ACm hi=E1=BB=83u c=C3=A1ch <a href=3D"https://support.apple.com/kb=
+/HT204030?cid=3Demail_receipt_itunes_article_HT204030" target=3D"_blank">qu=
+=E1=BA=A3n l=C3=BD t=C3=B9y ch=E1=BB=8Dn m=E1=BA=ADt kh=E1=BA=A9u</a> cho c=
+=C3=A1c m=E1=BB=A5c mua tr=C3=AAn iTunes, Apple=C2=A0Books v=C3=A0 App=C2=
+=A0Store.<br><br>ID Apple b=C3=A2y gi=E1=BB=9D l=C3=A0 T=C3=A0i=C2=A0kho=E1=
+=BA=A3n=C2=A0Apple. B=E1=BA=A1n v=E1=BA=ABn c=C3=B3 th=E1=BB=83 =C4=91=C4=
+=83ng nh=E1=BA=ADp b=E1=BA=B1ng c=C3=B9ng =C4=91=E1=BB=8Ba ch=E1=BB=89 emai=
+l ho=E1=BA=B7c s=E1=BB=91 =C4=91i=E1=BB=87n tho=E1=BA=A1i v=C3=A0 m=E1=BA=
+=ADt=C2=A0kh=E1=BA=A9u.  </td>
+  <td></td>
+</tr>
+<tr style=3D"height:40px"><td colspan=3D"4">=C2=A0</td></tr><tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" style=3D"font-size:12px;font-family:&#=
+39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(102,102,102)">
+    <img width=3D"26" height=3D"26" border=3D"0" alt=3D"Apple" src=3D"https=
+://s.mzstatic.com/email/images_shared/logo_apple_small_d-2x.png" style=3D"b=
+order:none;padding:0;margin:0">
+    <img width=3D"14" height=3D"14" border=3D"0" alt=3D"Apple" src=3D"https=
+://s.mzstatic.com/email/images_shared/logo_apple_small_m-3x.png" style=3D"d=
+isplay:none;border:none;padding:0;margin:0">
+  </td>
+  <td></td>
+</tr>
+<tr height=3D"8"><td colspan=3D"4">=C2=A0</td></tr>
+<tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" style=3D"font-size:12px;font-family:&#=
+39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(102,102,102)">
+<a href=3D"https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/account=
+Summary?mt=3D8" style=3D"color:#0073ff" target=3D"_blank">T=C3=A0i=C2=A0kho=
+=E1=BA=A3n=C2=A0Apple</a>=C2=A0=E2=80=A2=C2=A0<a href=3D"https://www.apple.=
+com/legal/internet-services/itunes/vn/terms.html#SALE" style=3D"color:#0073=
+ff" target=3D"_blank">=C4=90i=E1=BB=81u kho=E1=BA=A3n b=C3=A1n h=C3=A0ng</a=
+>=C2=A0=E2=80=A2=C2=A0<a href=3D"https://www.apple.com/legal/privacy/vn/" s=
+tyle=3D"color:#0073ff" target=3D"_blank">Ch=C3=ADnh s=C3=A1ch quy=E1=BB=81n=
+ ri=C3=AAng t=C6=B0</a>
+  </td>
+  <td></td>
+</tr>
+<tr height=3D"25"><td colspan=3D"4">=C2=A0</td></tr>
+<tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" dir=3D"auto" style=3D"font-size:12px;f=
+ont-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(10=
+2,102,102)">
+      B=E1=BA=A3n quy=E1=BB=81n =C2=A9 2026 Apple Distribution Internationa=
+l Ltd. <br>
+      <a href=3D"https://www.apple.com/asia/legal/" style=3D"color:#1187ff"=
+ target=3D"_blank">Gi=E1=BB=AF to=C3=A0n quy=E1=BB=81n</a>
+<br><span>Hollyhill Industrial Estate, Hollyhill, Cork, Ireland.</span>  </=
+td>
+  <td></td>
+</tr>
+<tr height=3D"25"><td colspan=3D"4" height=3D"30">=C2=A0</td></tr>
+</tbody></table>
+</div>
+
+       =20
+       =20
+        <div style=3D"display:none;padding:0;margin:0;height:0;max-height:0=
+;min-height:none;line-height:0;overflow:hidden">
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"480" align=
+=3D"center" style=3D"border-collapse:collapse;border-spacing:0">
+  <tbody><tr>
+    <td width=3D"15"></td>
+    <td><img width=3D"22" height=3D"22" alt=3D"Apple" src=3D"https://s.mzst=
+atic.com/email/images_shared/logo_apple_m-3x.png" border=3D"0" style=3D"bor=
+der:none;padding:0;margin:0"></td>
+    <td align=3D"right" style=3D"font-size:32px;font-family:&#39;Helvetica =
+Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(136,136,136)">Bi=C3=AAn Nh=
+=E1=BA=ADn</td>
+    <td width=3D"15"></td>
+  </tr>
+  <tr height=3D"15"><td colspan=3D"4">=C2=A0</td></tr><tr>
+  </tr><tr>
+    <td colspan=3D"4" align=3D"center">
+<table border=3D"0" cellspacing=3D"0" cellpadding=3D"0" width=3D"450" style=
+=3D"border-collapse:collapse;border-spacing:0">
+  <tbody><tr>
+    <td>
+      <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"bord=
+er-collapse:collapse;border-spacing:0;color:rgb(51,51,51);background-color:=
+rgb(250,250,250);border-radius:3px;font-size:12px;font-family:&#39;Helvetic=
+a Neue&#39;,Helvetica,Arial,sans-serif;border-color:#ffffff;border-style:so=
+lid;border-top-color:#ffffff;border-bottom-color:#ffffff">
+        <tbody><tr height=3D"44">
+          <td colspan=3D"2">
+            <span style=3D"color:rgb(102,102,102);font-size:10px;font-weigh=
+t:600">
+T=C3=80I=C2=A0KHO=E1=BA=A2N=C2=A0APPLE</span><br><span style=3D"color:#0073=
+ff"><a href=3D"mailto:baotg.it@gmail.com">baotg.it@gmail.com</a>
+            </span>
+          </td>
+        </tr>
+        <tr height=3D"44">
+          <td width=3D"225" style=3D"padding-left:15px;border-style:solid;b=
+order-color:#ffffff;border-top-width:0px;border-left-width:0;border-right-w=
+idth:1px;border-bottom-width:1px">
+            <span style=3D"color:rgb(102,102,102);font-size:10px;font-weigh=
+t:600">ID =C4=90=C6=A0N H=C3=80NG</span><br><span style=3D"color:#0070c9">M=
+X5X512B75</span>
+          </td>
+          <td width=3D"225" style=3D"padding-left:15px;border-style:solid;b=
+order-color:#ffffff;border-top-width:0px;border-left-width:0;border-right-w=
+idth:0;border-bottom-width:1px">
+            <span style=3D"color:rgb(102,102,102);font-size:10px;font-weigh=
+t:600">
+                S=E1=BB=90 T=C3=80I LI=E1=BB=86U</span><br>708094616717
+          </td>
+        </tr>
+        <tr height=3D"44">
+          <td colspan=3D"2" style=3D"padding-left:15px;border-style:solid;b=
+order-color:#ffffff;border-top-width:0px;border-left-width:0;border-right-w=
+idth:1px;border-bottom-width:1px">
+            <span style=3D"color:rgb(102,102,102);font-size:10px;font-weigh=
+t:600">
+NG=C3=80Y</span><br>20/02/2026
+          </td>
+        </tr>
+
+        <tr height=3D"90">
+          <td colspan=3D"2" style=3D"padding-left:15px;padding-right:15px;b=
+order-style:solid;border-color:#ffffff;border-top-width:0px;border-left-wid=
+th:0;border-right-width:0;border-bottom-width:0px;padding-top:8px;padding-b=
+ottom:8px">
+            <span style=3D"color:rgb(102,102,102);font-size:10px;font-weigh=
+t:600">XU=E1=BA=A4T H=C3=93A =C4=90=C6=A0N =C4=90=E1=BA=BEN</span><br>
+MasterCard .... 3021<br>Tran  Gia Bao<br>
+9D Nguyen Huu Tho<br>Ho Chi Minh, 70000<br>VNM          </td>
+        </tr>
+      </tbody></table>
+    </td>
+  </tr>
+
+  <tr height=3D"20"><td></td></tr>
+  <tr>
+    <td width=3D"450">
+      <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"bord=
+er-collapse:collapse;border-spacing:0;width:100%;color:rgb(51,51,51);font-s=
+ize:12px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif">
+        <tbody><tr height=3D"24" style=3D"background-color:rgb(250,250,250)=
+">
+          <td colspan=3D"2" style=3D"padding-left:15px"><span style=3D"font=
+-size:11px;font-weight:600">App Store</span></td>
+        </tr>
+  <tr height=3D"15"><td colspan=3D"2"></td></tr>
+  <tr style=3D"max-height:114px">
+    <td width=3D"75" align=3D"center" valign=3D"top" style=3D"padding:0 0 0=
+ 15px;margin:0;width:64px">
+      <img src=3D"https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/09/=
+a8/00/09a8007a-2633-f5e3-72e6-46118e721e3b/AppIcon_TikTok-0-0-1x_U007epad-0=
+-1-0-0-85-220.png/128x128bb.jpg" width=3D"64" height=3D"64" border=3D"0" al=
+t=3D"" style=3D"padding:0;margin:0;border-radius:14px;border:1px solid rgba=
+(128,128,128,0.2)">
+    </td>
+    <td style=3D"padding:0 0 0 15px;line-height:15px">
+      <span dir=3D"auto" style=3D"font-weight:600">
+TikTok
+      </span><br>
+<span style=3D"color:rgb(102,102,102)">70 Coins</span><br>        <span sty=
+le=3D"color:rgb(102,102,102);font-size:10px">
+Mua In-App        </span><br>
+<span style=3D"color:rgb(102,102,102);font-size:10px">Gia Bao=E2=80=99s iPh=
+one</span><br>      <a style=3D"font-size:10px">
+</a><a href=3D"https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/rep=
+ortAProblem?a=3D6742110361&amp;cc=3Dvn&amp;d=3D20733206836&amp;l=3Dvi&amp;o=
+=3Di&amp;p=3D110055490252777&amp;pli=3D110072882330968&amp;s=3D1" style=3D"=
+color:#0070c9" target=3D"_blank">B=C3=A1o c=C3=A1o l=E1=BB=97i</a>     =20
+    </td>
+  </tr>
+  <tr>
+    <td width=3D"100" align=3D"right" valign=3D"top" style=3D"padding-right=
+:15px;width:100px" colspan=3D"2">
+      <table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" style=3D"bord=
+er-collapse:collapse;border-spacing:0;font-size:12px;font-family:inherit">
+        <tbody><tr><td align=3D"right" colspan=3D"3"><span style=3D"font-we=
+ight:600;white-space:nowrap">31.000=C4=91</span></td></tr>
+      </tbody></table>
+    </td>
+  </tr>
+      </tbody></table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width=3D"450" border=3D"0" cellpadding=3D"0" cellspacing=3D"0"=
+ style=3D"width:450px;color:rgb(51,51,51);font-family:&#39;Helvetica Neue&#=
+39;,Helvetica,Arial,sans-serif">
+        <tbody><tr height=3D"30"><td colspan=3D"2"></td></tr>
+        <tr height=3D"1"><td height=3D"1" colspan=3D"2" style=3D"padding:0 =
+10px 0 10px"><div style=3D"line-height:1px;height:1px;background-color:rgb(=
+238,238,238)"></div></td></tr>
+        <tr height=3D"48">
+          <td style=3D"padding-left:15px;color:rgb(102,102,102);font-size:1=
+0px;font-weight:600">T=E1=BB=94NG C=E1=BB=98NG</td>
+          <td width=3D"120" align=3D"right" style=3D"width:120px;padding-ri=
+ght:15px;font-size:16px;font-weight:600;white-space:nowrap">
+              31.000=C4=91
+          </td>
+        </tr>
+        <tr height=3D"1"><td height=3D"1" colspan=3D"2" style=3D"padding:0 =
+10px 0 10px"><div style=3D"line-height:1px;height:1px;background-color:rgb(=
+238,238,238)"></div></td></tr>
+      </tbody></table>
+    </td>
+  </tr>
+</tbody></table>
+  </td>
+</tr>
+<tr height=3D"15"><td colspan=3D"4">=C2=A0</td></tr>
+<tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" style=3D"font-size:12px;font-family:&#=
+39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(102,102,102)">
+        Nh=E1=BA=ADn tr=E1=BB=A3 gi=C3=BAp v=E1=BB=81 =C4=91=C4=83ng k=C3=
+=BD v=C3=A0 m=E1=BB=A5c mua. <a href=3D"https://support.apple.com/en-vn/bil=
+ling?cid=3Demail_receipt" target=3D"_blank">Truy C=E1=BA=ADp Trang H=E1=BB=
+=97 Tr=E1=BB=A3 Apple</a>.
+    T=C3=ACm hi=E1=BB=83u c=C3=A1ch <a href=3D"https://support.apple.com/kb=
+/HT204030?cid=3Demail_receipt_itunes_article_HT204030" target=3D"_blank">qu=
+=E1=BA=A3n l=C3=BD t=C3=B9y ch=E1=BB=8Dn m=E1=BA=ADt kh=E1=BA=A9u</a> cho c=
+=C3=A1c m=E1=BB=A5c mua tr=C3=AAn iTunes, Apple=C2=A0Books v=C3=A0 App=C2=
+=A0Store.<br><br>ID Apple b=C3=A2y gi=E1=BB=9D l=C3=A0 T=C3=A0i=C2=A0kho=E1=
+=BA=A3n=C2=A0Apple. B=E1=BA=A1n v=E1=BA=ABn c=C3=B3 th=E1=BB=83 =C4=91=C4=
+=83ng nh=E1=BA=ADp b=E1=BA=B1ng c=C3=B9ng =C4=91=E1=BB=8Ba ch=E1=BB=89 emai=
+l ho=E1=BA=B7c s=E1=BB=91 =C4=91i=E1=BB=87n tho=E1=BA=A1i v=C3=A0 m=E1=BA=
+=ADt=C2=A0kh=E1=BA=A9u.  </td>
+  <td style=3D"display:none;max-height:0;line-height:0"></td>
+</tr>
+<tr height=3D"25"><td colspan=3D"4">=C2=A0</td></tr>
+<tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" style=3D"font-size:12px;font-family:&#=
+39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(102,102,102)">
+    <img width=3D"14" height=3D"14" border=3D"0" alt=3D"" src=3D"https://s.=
+mzstatic.com/email/images_shared/logo_apple_small_m-3x.png" style=3D"border=
+:none;padding:0;margin:0">
+  </td>
+  <td></td>
+</tr>
+<tr height=3D"8"><td colspan=3D"4">=C2=A0</td></tr>
+<tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" style=3D"font-size:12px;font-family:&#=
+39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(102,102,102)">
+<a href=3D"https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/account=
+Summary?mt=3D8" style=3D"color:#0073ff" target=3D"_blank">T=C3=A0i=C2=A0kho=
+=E1=BA=A3n=C2=A0Apple</a>=C2=A0=E2=80=A2=C2=A0<a href=3D"https://www.apple.=
+com/legal/internet-services/itunes/vn/terms.html#SALE" style=3D"color:#0073=
+ff" target=3D"_blank">=C4=90i=E1=BB=81u kho=E1=BA=A3n b=C3=A1n h=C3=A0ng</a=
+>=C2=A0=E2=80=A2=C2=A0<a href=3D"https://www.apple.com/legal/privacy/vn/" s=
+tyle=3D"color:#0073ff" target=3D"_blank">Ch=C3=ADnh s=C3=A1ch quy=E1=BB=81n=
+ ri=C3=AAng t=C6=B0</a>
+  </td>
+  <td></td>
+</tr>
+<tr height=3D"25"><td colspan=3D"4">=C2=A0</td></tr>
+<tr>
+  <td></td>
+  <td colspan=3D"2" align=3D"center" dir=3D"auto" style=3D"font-size:12px;f=
+ont-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;color:rgb(10=
+2,102,102)">
+    B=E1=BA=A3n quy=E1=BB=81n =C2=A9 2026 Apple Distribution International =
+Ltd. <br><a href=3D"https://www.apple.com/asia/legal/" style=3D"color:#0073=
+ff" target=3D"_blank">Gi=E1=BB=AF to=C3=A0n quy=E1=BB=81n</a>
+      <br><span>
+      Hollyhill Industrial Estate, Hollyhill, Cork, Ireland.
+      </span>
+  </td>
+  <td></td>
+</tr>
+<tr height=3D"25"><td colspan=3D"4" height=3D"30">=C2=A0</td></tr>
+</tbody></table>
+</div>
+
+
+       =20
+      </td>
+    </tr>
+  </tbody></table>
+  <br><br>
+</div>
+</div></div>
+
+--0000000000003b78ed064c0be534--

@@ -1,0 +1,16 @@
+Subject: Transaction Alert - Debit
+From: yourbank@example.com
+Date: 15/01/2024
+Content-Type: text/plain
+
+Dear Customer,
+
+A transaction has been made on your account:
+
+Amount: $50.00
+Description: GROCERY STORE PURCHASE
+Date: 15/01/2024
+Transaction Type: DEBITED
+
+Thank you,
+Your Bank

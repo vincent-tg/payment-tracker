@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  payment-tracker:
+    build: .
+    container_name: payment-tracker
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+      - DATABASE_PATH=/app/data/payments.db
+      - EMAIL_ADDRESS=${EMAIL_ADDRESS:-test@example.com}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-testpassword}
+      - IMAP_SERVER=${IMAP_SERVER:-imap.gmail.com}
+      - IMAP_PORT=${IMAP_PORT:-993}
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    command: ["/app/payment-tracker", "list"]
+    
+  # Optional: Add a database viewer/admin interface
+  db-admin:
+    image: phpmyadmin/phpmyadmin
+    container_name: payment-tracker-db-admin
+    restart: unless-stopped
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=host.docker.internal
+      - PMA_PORT=3306
+    ports:
+      - "8080:80"
+    depends_on:
+      - payment-tracker
+
+volumes:
+  data:
+  config:

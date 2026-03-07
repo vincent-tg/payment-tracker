@@ -1,0 +1,37 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: payment-tracker-runner
+  namespace: actions-runner-system
+spec:
+  replicas: 1
+  template:
+    spec:
+      repository: vincent-tg/payment-tracker
+      labels:
+        - self-hosted
+        - linux
+        - arm64
+        - k3s
+      dockerdWithinRunnerContainer: true
+      image: summerwind/actions-runner:latest
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 998  # docker group
+        fsGroup: 1000
+      resources:
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+      volumeMounts:
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket

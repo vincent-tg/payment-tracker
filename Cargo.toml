@@ -1,0 +1,57 @@
+[package]
+name = "payment-tracker"
+version = "0.1.0"
+edition = "2024"
+description = "Rust application for tracking payment cash in/out by parsing bank emails"
+authors = ["Vincent TG"]
+license = "MIT"
+repository = "https://github.com/vincent-tg/payment-tracker"
+readme = "README.md"
+keywords = ["banking", "email", "finance", "tracking", "vib"]
+categories = ["command-line-utilities", "financial"]
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "macros", "chrono"] }
+tokio = { version = "1.0", features = ["full"] }
+anyhow = "1.0"
+regex = "1.0"
+tabled = { version = "0.14", features = ["derive"] }
+toml = "0.8"
+imap = "2.1.0"
+mailparse = "0.14"
+native-tls = { version = "0.2", features = ["vendored"] }
+base64 = "0.21"
+axum = "0.7"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+[dev-dependencies]
+tempfile = "3.10"
+
+[[bin]]
+name = "payment-tracker"
+path = "src/main.rs"
+
+[[example]]
+name = "daily_vib_tracker"
+path = "examples/bin/daily_vib_tracker.rs"
+
+[[example]]
+name = "init_postgres"
+path = "examples/bin/init_postgres.rs"
+
+[[example]]
+name = "final_demo"
+path = "examples/bin/final_demo.rs"
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Maximize size reduction optimizations
+panic = "abort"     # Remove panic unwinding (reduces size)
+strip = true        # Strip symbols from binary
