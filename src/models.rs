@@ -40,6 +40,7 @@ impl Transaction {
         }
     }
     
+    #[allow(clippy::too_many_arguments)]
     pub fn from_email(date: NaiveDate, description: String, amount: f64, currency: String, r#type: String, bank: String, transaction_id: Option<String>, email_message_id: Option<String>) -> Self {
         Self {
             id: 0,

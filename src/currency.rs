@@ -12,6 +12,12 @@ pub struct CurrencyConverter {
     rates: HashMap<String, f64>,
 }
 
+impl Default for CurrencyConverter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CurrencyConverter {
     pub fn new() -> Self {
         let mut rates = HashMap::new();

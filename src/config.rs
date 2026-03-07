@@ -48,7 +48,7 @@ pub enum EmailProvider {
 }
 
 impl EmailProvider {
-    pub fn from_str(s: &str) -> Self {
+    pub fn from_provider_name(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "gmail" | "google" => EmailProvider::Gmail,
             "outlook" | "office365" | "microsoft" => EmailProvider::Outlook,
@@ -107,7 +107,7 @@ impl Config {
     
     fn apply_provider_settings(&mut self) {
         if let Some(ref provider) = self.email.provider {
-            let provider_type = EmailProvider::from_str(provider);
+            let provider_type = EmailProvider::from_provider_name(provider);
             let (server, port) = provider_type.get_imap_settings();
             
             if self.email.imap_server.is_empty() || self.email.imap_server == "imap.example.com" {
