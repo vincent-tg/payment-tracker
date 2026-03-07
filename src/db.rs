@@ -302,6 +302,38 @@ impl Database {
             top_categories,
         })
     }
+
+    pub async fn get_transaction_by_id(&self, id: i64) -> Result<Option<Transaction>> {
+        let row = sqlx::query_as::<_, TransactionRow>(
+            "SELECT * FROM transactions WHERE id = $1",
+        )
+        .bind(id)
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(row.map(|row| Transaction {
+            id: row.id,
+            date: NaiveDate::from_str(&row.date).unwrap_or_else(|_| Local::now().date_naive()),
+            description: row.description,
+            amount: row.amount,
+            currency: row.currency,
+            r#type: row.r#type,
+            source: row.source,
+            bank: row.bank,
+            transaction_id: row.transaction_id,
+            email_message_id: row.email_message_id,
+            created_at: DateTime::from_str(&row.created_at).unwrap_or(Local::now()),
+        }))
+    }
+
+    pub async fn delete_transaction(&self, id: i64) -> Result<bool> {
+        let result = sqlx::query("DELETE FROM transactions WHERE id = $1")
+            .bind(id)
+            .execute(&self.pool)
+            .await?;
+
+        Ok(result.rows_affected() > 0)
+    }
 }
 
 #[derive(sqlx::FromRow)]

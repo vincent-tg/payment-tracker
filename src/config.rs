@@ -1,4 +1,5 @@
 use anyhow::Result;
+use std::env;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
@@ -97,9 +98,17 @@ impl Config {
             let content = fs::read_to_string(&config_path)?;
             let mut config: Config = toml::from_str(&content)?;
             config.apply_provider_settings();
+            // Override database connection string from environment if provided (Supabase)
+            if let Ok(supabase_url) = env::var("SUPABASE_CONNECTION_STRING") {
+                config.database.connection_string = Some(supabase_url);
+            }
             Ok(config)
         } else {
-            let config = Config::default();
+            let mut config = Config::default();
+            // Override with env var if present even for fresh config
+            if let Ok(supabase_url) = env::var("SUPABASE_CONNECTION_STRING") {
+                config.database.connection_string = Some(supabase_url);
+            }
             config.save()?;
             Ok(config)
         }

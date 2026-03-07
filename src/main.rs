@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use payment_tracker::{App, config::Config, db};
+use std::sync::Arc;
 
 #[derive(Parser)]
 #[command(name = "payment-tracker")]
@@ -90,7 +91,14 @@ enum Commands {
     /// Initialize the database
     Init,
 
-    /// Start web server with health endpoints
+    /// Start the full REST API server
+    Api {
+        /// Port to listen on
+        #[arg(short, long, default_value_t = 8080)]
+        port: u16,
+    },
+
+    /// Start web server with health endpoint only (legacy)
     Serve {
         /// Port to listen on
         #[arg(short, long, default_value_t = 8080)]
@@ -180,12 +188,41 @@ async fn main() -> Result<()> {
             println!("Database initialized successfully!");
         }
 
+        Commands::Api { port } => {
+            // Initialize tracing
+            tracing_subscriber::fmt::init();
+
+            println!("📦 Initializing Payment Tracker API...");
+
+            let config = Config::load()?;
+            let conn_str = config.database.get_connection_string();
+
+            // Auto-initialize database
+            println!("📦 Initializing database...");
+            match db::Database::init_database(&conn_str).await {
+                Ok(()) => println!("✅ Database ready"),
+                Err(e) => println!("⚠️  Database init: {}", e),
+            }
+
+            let database = db::Database::new(&conn_str).await?;
+            let currency = payment_tracker::currency::CurrencyConverter::new();
+
+            let state = Arc::new(payment_tracker::web::AppState {
+                db: database,
+                config,
+                currency,
+            });
+
+            payment_tracker::web::start_api_server(port, state).await?;
+        }
+
         Commands::Serve { port } => {
             println!(
                 "🚀 Starting VIB Payment Tracker web server on port {}",
                 port
             );
             println!("   Health endpoint: http://0.0.0.0:{}/health", port);
+            println!("   💡 Tip: Use `payment-tracker api` for the full REST API");
             payment_tracker::web::start_health_server(port).await?;
         }
 
