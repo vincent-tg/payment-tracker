@@ -337,11 +337,7 @@ async fn create_transaction(
 ) -> impl IntoResponse {
     // Validate type
     if body.r#type != "in" && body.r#type != "out" {
-        return api_error(
-            StatusCode::BAD_REQUEST,
-            "type must be 'in' or 'out'",
-        )
-        .into_response();
+        return api_error(StatusCode::BAD_REQUEST, "type must be 'in' or 'out'").into_response();
     }
 
     if body.amount <= 0.0 {
@@ -352,8 +348,12 @@ async fn create_transaction(
         return api_error(StatusCode::BAD_REQUEST, "description cannot be empty").into_response();
     }
 
-    let mut transaction =
-        Transaction::new_manual(body.amount, &body.description, &body.r#type, body.date.as_deref());
+    let mut transaction = Transaction::new_manual(
+        body.amount,
+        &body.description,
+        &body.r#type,
+        body.date.as_deref(),
+    );
 
     // Override defaults if provided
     if let Some(currency) = &body.currency {
@@ -387,9 +387,11 @@ async fn get_transaction(
             let response: TransactionResponse = transaction.into();
             ApiResponse::ok(response).into_response()
         }
-        Ok(None) => {
-            api_error(StatusCode::NOT_FOUND, format!("Transaction {} not found", id)).into_response()
-        }
+        Ok(None) => api_error(
+            StatusCode::NOT_FOUND,
+            format!("Transaction {} not found", id),
+        )
+        .into_response(),
         Err(e) => api_error(
             StatusCode::INTERNAL_SERVER_ERROR,
             format!("Failed to fetch transaction: {}", e),
@@ -408,9 +410,11 @@ async fn delete_transaction(
             let response = json!({ "deleted": true, "id": id });
             ApiResponse::ok(response).into_response()
         }
-        Ok(false) => {
-            api_error(StatusCode::NOT_FOUND, format!("Transaction {} not found", id)).into_response()
-        }
+        Ok(false) => api_error(
+            StatusCode::NOT_FOUND,
+            format!("Transaction {} not found", id),
+        )
+        .into_response(),
         Err(e) => api_error(
             StatusCode::INTERNAL_SERVER_ERROR,
             format!("Failed to delete transaction: {}", e),
@@ -541,9 +545,7 @@ async fn list_currencies(State(state): State<SharedState>) -> impl IntoResponse 
     let currencies = state.currency.get_supported_currencies();
     let mut sorted: Vec<String> = currencies.into_iter().map(|s| s.to_string()).collect();
     sorted.sort();
-    ApiResponse::ok(CurrencyInfo {
-        currencies: sorted,
-    })
+    ApiResponse::ok(CurrencyInfo { currencies: sorted })
 }
 
 /// POST /api/currencies/convert
