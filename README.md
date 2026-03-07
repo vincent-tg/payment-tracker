@@ -11,4 +11,5 @@ A Rust application for tracking payment cash in/out by parsing bank emails, with
 - **CI/CD**: Automated testing and deployment via GitHub Actions
 
 ## CI/CD Status
-Last test trigger: 2026-03-07 06:22:23 UTC
+Last test trigger: 2026-03-07 06:33:55 UTC
+Fixed: Added PostgreSQL setup for CI tests
