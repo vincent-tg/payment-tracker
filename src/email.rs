@@ -302,35 +302,36 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
 
     // Try to extract amount with currency
     for (pattern, group) in patterns {
-        if let Ok(re) = Regex::new(pattern)
-            && let Some(caps) = re.captures(&body)
-            && let Some(amount_str) = caps.get(group)
-        {
-            let cleaned = amount_str.as_str().replace(',', "");
-            if let Ok(parsed_amount) = cleaned.parse::<f64>() {
-                amount = Some(parsed_amount);
+        if let Ok(re) = Regex::new(pattern) {
+            if let Some(caps) = re.captures(&body) {
+                if let Some(amount_str) = caps.get(group) {
+                    let cleaned = amount_str.as_str().replace(',', "");
+                    if let Ok(parsed_amount) = cleaned.parse::<f64>() {
+                        amount = Some(parsed_amount);
 
-                // Determine currency based on pattern match
-                let full_match = caps.get(0).unwrap().as_str().to_lowercase();
-                if full_match.contains("vnd") {
-                    currency = "VND".to_string();
-                } else if full_match.contains("€") || full_match.contains("eur") {
-                    currency = "EUR".to_string();
-                } else if full_match.contains("£") || full_match.contains("gbp") {
-                    currency = "GBP".to_string();
-                } else if full_match.contains("¥") || full_match.contains("jpy") {
-                    currency = "JPY".to_string();
-                } else if full_match.contains("usd") {
-                    currency = "USD".to_string();
-                } else if full_match.contains("$") {
-                    currency = "USD".to_string(); // $ usually means USD
-                }
-                // If no currency detected but bank is VIB, assume VND
-                else if bank == "VIB" {
-                    currency = "VND".to_string();
-                }
+                        // Determine currency based on pattern match
+                        let full_match = caps.get(0).unwrap().as_str().to_lowercase();
+                        if full_match.contains("vnd") {
+                            currency = "VND".to_string();
+                        } else if full_match.contains("€") || full_match.contains("eur") {
+                            currency = "EUR".to_string();
+                        } else if full_match.contains("£") || full_match.contains("gbp") {
+                            currency = "GBP".to_string();
+                        } else if full_match.contains("¥") || full_match.contains("jpy") {
+                            currency = "JPY".to_string();
+                        } else if full_match.contains("usd") {
+                            currency = "USD".to_string();
+                        } else if full_match.contains("$") {
+                            currency = "USD".to_string(); // $ usually means USD
+                        }
+                        // If no currency detected but bank is VIB, assume VND
+                        else if bank == "VIB" {
+                            currency = "VND".to_string();
+                        }
 
-                break;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -352,29 +353,31 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
     ];
 
     for pattern in transaction_id_patterns {
-        if let Ok(re) = Regex::new(pattern)
-            && let Some(caps) = re.captures(&body)
-            && let Some(id_match) = caps.get(1)
-        {
-            transaction_id = Some(id_match.as_str().to_string());
-            break;
+        if let Ok(re) = Regex::new(pattern) {
+            if let Some(caps) = re.captures(&body) {
+                if let Some(id_match) = caps.get(1) {
+                    transaction_id = Some(id_match.as_str().to_string());
+                    break;
+                }
+            }
         }
     }
 
     // If no transaction ID found, try to extract from email subject
-    if transaction_id.is_none()
-        && let Some(subject) = parsed.headers.get_first_value("Subject")
-    {
-        // Look for patterns like "GD123456" in subject
-        let subject_patterns = vec![r"GD\s*([0-9]+)", r"#([0-9]+)", r"\[([A-Z0-9]+)\]"];
+    if transaction_id.is_none() {
+        if let Some(subject) = parsed.headers.get_first_value("Subject") {
+            // Look for patterns like "GD123456" in subject
+            let subject_patterns = vec![r"GD\s*([0-9]+)", r"#([0-9]+)", r"\[([A-Z0-9]+)\]"];
 
-        for pattern in subject_patterns {
-            if let Ok(re) = Regex::new(pattern)
-                && let Some(caps) = re.captures(&subject)
-                && let Some(id_match) = caps.get(1)
-            {
-                transaction_id = Some(id_match.as_str().to_string());
-                break;
+            for pattern in subject_patterns {
+                if let Ok(re) = Regex::new(pattern) {
+                    if let Some(caps) = re.captures(&subject) {
+                        if let Some(id_match) = caps.get(1) {
+                            transaction_id = Some(id_match.as_str().to_string());
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
@@ -465,39 +468,40 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
     let mut date = Local::now().date_naive();
 
     for pattern in date_patterns {
-        if let Ok(re) = Regex::new(pattern)
-            && let Some(caps) = re.captures(&body)
-            && let Some(date_str) = caps.get(1)
-        {
-            let date_text = date_str.as_str().to_lowercase();
+        if let Ok(re) = Regex::new(pattern) {
+            if let Some(caps) = re.captures(&body) {
+                if let Some(date_str) = caps.get(1) {
+                    let date_text = date_str.as_str().to_lowercase();
 
-            // Handle relative dates
-            if date_text == "today" {
-                date = Local::now().date_naive();
-                break;
-            } else if date_text == "yesterday" {
-                date = Local::now().date_naive() - chrono::Duration::days(1);
-                break;
-            }
+                    // Handle relative dates
+                    if date_text == "today" {
+                        date = Local::now().date_naive();
+                        break;
+                    } else if date_text == "yesterday" {
+                        date = Local::now().date_naive() - chrono::Duration::days(1);
+                        break;
+                    }
 
-            // Try different date formats
-            let formats = [
-                "%m/%d/%Y",
-                "%d/%m/%Y",
-                "%Y-%m-%d",
-                "%m-%d-%Y",
-                "%d-%m-%Y",
-                "%b %d, %Y",
-                "%B %d, %Y",
-                "%d %b %Y",
-                "%d %B %Y",
-                "%m/%d/%y",
-                "%d/%m/%y",
-            ];
-            for fmt in formats {
-                if let Ok(parsed) = NaiveDate::parse_from_str(&date_text, fmt) {
-                    date = parsed;
-                    break;
+                    // Try different date formats
+                    let formats = [
+                        "%m/%d/%Y",
+                        "%d/%m/%Y",
+                        "%Y-%m-%d",
+                        "%m-%d-%Y",
+                        "%d-%m-%Y",
+                        "%b %d, %Y",
+                        "%B %d, %Y",
+                        "%d %b %Y",
+                        "%d %B %Y",
+                        "%m/%d/%y",
+                        "%d/%m/%y",
+                    ];
+                    for fmt in formats {
+                        if let Ok(parsed) = NaiveDate::parse_from_str(&date_text, fmt) {
+                            date = parsed;
+                            break;
+                        }
+                    }
                 }
             }
         }
