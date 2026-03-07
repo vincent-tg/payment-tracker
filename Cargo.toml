@@ -18,7 +18,6 @@ chrono = { version = "0.4", features = ["serde"] }
 sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "macros", "chrono"] }
 tokio = { version = "1.0", features = ["full"] }
 anyhow = "1.0"
-thiserror = "1.0"
 regex = "1.0"
 tabled = { version = "0.14", features = ["derive"] }
 toml = "0.8"
@@ -26,11 +25,8 @@ imap = "2.1.0"
 mailparse = "0.14"
 native-tls = "0.2"
 base64 = "0.21"
-encoding = "0.2"
-mime = "0.3"
 axum = "0.7"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
-tower = "0.4"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 
@@ -52,3 +48,10 @@ path = "examples/bin/init_postgres.rs"
 [[example]]
 name = "final_demo"
 path = "examples/bin/final_demo.rs"
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Maximize size reduction optimizations
+panic = "abort"     # Remove panic unwinding (reduces size)
+strip = true        # Strip symbols from binary
