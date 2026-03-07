@@ -36,28 +36,7 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install -y libssl-dev pkg-config
-    
-    - name: Setup kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'latest'
 
-    - name: Set up PostgreSQL for tests
-      run: |
-        # Deploy PostgreSQL to k3s
-        kubectl apply -f k8s/postgresql.yaml -n default
-        
-        # Wait for PostgreSQL to be ready
-        echo "Waiting for PostgreSQL to be ready..."
-        kubectl wait --for=condition=ready pod -l app=postgres -n default --timeout=120s
-        
-        # Check PostgreSQL status
-        kubectl get pods -n default
-        kubectl get svc -n default
-        
-        # Set environment variables for tests
-        echo "DATABASE_URL=postgres://payment_user:payment_password@postgres.default.svc.cluster.local:5432/payment_tracker" >> $GITHUB_ENV
-    
     - name: Run tests
       run: cargo test --verbose
     
