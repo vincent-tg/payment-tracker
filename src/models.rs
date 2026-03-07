@@ -8,11 +8,11 @@ pub struct Transaction {
     pub date: NaiveDate,
     pub description: String,
     pub amount: f64,
-    pub currency: String, // "USD", "VND", "EUR", etc.
-    pub r#type: String, // "in" or "out"
-    pub source: String, // "email" or "manual"
-    pub bank: String, // "VIB", "Chase", "PayPal", etc.
-    pub transaction_id: Option<String>, // Unique ID from bank for upsert
+    pub currency: String,                 // "USD", "VND", "EUR", etc.
+    pub r#type: String,                   // "in" or "out"
+    pub source: String,                   // "email" or "manual"
+    pub bank: String,                     // "VIB", "Chase", "PayPal", etc.
+    pub transaction_id: Option<String>,   // Unique ID from bank for upsert
     pub email_message_id: Option<String>, // Email message ID for tracking
     pub created_at: DateTime<Local>,
 }
@@ -24,7 +24,7 @@ impl Transaction {
         } else {
             Local::now().date_naive()
         };
-        
+
         Self {
             id: 0,
             date,
@@ -39,9 +39,18 @@ impl Transaction {
             created_at: Local::now(),
         }
     }
-    
+
     #[allow(clippy::too_many_arguments)]
-    pub fn from_email(date: NaiveDate, description: String, amount: f64, currency: String, r#type: String, bank: String, transaction_id: Option<String>, email_message_id: Option<String>) -> Self {
+    pub fn from_email(
+        date: NaiveDate,
+        description: String,
+        amount: f64,
+        currency: String,
+        r#type: String,
+        bank: String,
+        transaction_id: Option<String>,
+        email_message_id: Option<String>,
+    ) -> Self {
         Self {
             id: 0,
             date,
@@ -56,15 +65,15 @@ impl Transaction {
             created_at: Local::now(),
         }
     }
-    
+
     pub fn is_in(&self) -> bool {
         self.r#type == "in"
     }
-    
+
     pub fn is_out(&self) -> bool {
         self.r#type == "out"
     }
-    
+
     pub fn to_usd(&self) -> f64 {
         // Simple conversion for now
         match self.currency.to_uppercase().as_str() {
@@ -75,7 +84,7 @@ impl Transaction {
             _ => self.amount, // Assume USD or 1:1 for other currencies
         }
     }
-    
+
     pub fn format_amount(&self) -> String {
         match self.currency.to_uppercase().as_str() {
             "VND" => format!("{:.0} VND", self.amount),
@@ -83,7 +92,7 @@ impl Transaction {
             _ => format!("${:.2} {}", self.amount, self.currency),
         }
     }
-    
+
     pub fn format_with_conversion(&self) -> String {
         if self.currency.to_uppercase() == "USD" {
             self.format_amount()

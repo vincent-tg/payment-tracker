@@ -1,6 +1,6 @@
 use anyhow::Result;
 use chrono::{DateTime, Datelike, Local, NaiveDate};
-use sqlx::{postgres::PgPoolOptions, Row, PgPool};
+use sqlx::{PgPool, Row, postgres::PgPoolOptions};
 use std::str::FromStr;
 
 use crate::models::{Summary, Transaction};
@@ -11,18 +11,14 @@ pub struct Database {
 
 impl Database {
     pub async fn new(connection_string: &str) -> Result<Self> {
-        let pool = PgPoolOptions::new()
-            .connect(connection_string)
-            .await?;
-        
+        let pool = PgPoolOptions::new().connect(connection_string).await?;
+
         Ok(Self { pool })
     }
-    
+
     pub async fn init_database(connection_string: &str) -> Result<()> {
-        let pool = PgPoolOptions::new()
-            .connect(connection_string)
-            .await?;
-        
+        let pool = PgPoolOptions::new().connect(connection_string).await?;
+
         sqlx::query(
             r#"
             CREATE TABLE IF NOT EXISTS transactions (
@@ -44,11 +40,14 @@ impl Database {
         )
         .execute(&pool)
         .await?;
-        
-        println!("Database initialized successfully with connection: {}", connection_string);
+
+        println!(
+            "Database initialized successfully with connection: {}",
+            connection_string
+        );
         Ok(())
     }
-    
+
     pub async fn insert_transaction(&self, transaction: &Transaction) -> Result<i64> {
         // Use transaction_id for upsert if available, otherwise use email_message_id
         let conflict_target = if transaction.transaction_id.is_some() {
@@ -59,7 +58,7 @@ impl Database {
             // Fallback to composite key
             "(date, description, amount, type, currency, bank)"
         };
-        
+
         let query = format!(
             r#"
             INSERT INTO transactions (date, description, amount, currency, type, source, bank, transaction_id, email_message_id, created_at)
@@ -76,7 +75,7 @@ impl Database {
             RETURNING id
             "#
         );
-        
+
         let result = sqlx::query(&query)
             .bind(transaction.date.to_string())
             .bind(&transaction.description)
@@ -90,11 +89,11 @@ impl Database {
             .bind(transaction.created_at.to_string())
             .fetch_one(&self.pool)
             .await?;
-        
+
         let id: i64 = result.get("id");
         Ok(id)
     }
-    
+
     pub async fn transaction_exists(&self, transaction: &Transaction) -> Result<bool> {
         // First check by transaction_id if available
         if let Some(ref transaction_id) = transaction.transaction_id {
@@ -108,13 +107,13 @@ impl Database {
             .bind(&transaction.bank)
             .fetch_one(&self.pool)
             .await?;
-            
+
             let count: i64 = result.get("count");
             if count > 0 {
                 return Ok(true);
             }
         }
-        
+
         // Then check by email_message_id if available
         if let Some(ref email_message_id) = transaction.email_message_id {
             let result = sqlx::query(
@@ -126,13 +125,13 @@ impl Database {
             .bind(email_message_id)
             .fetch_one(&self.pool)
             .await?;
-            
+
             let count: i64 = result.get("count");
             if count > 0 {
                 return Ok(true);
             }
         }
-        
+
         // Fallback to composite key check
         let result = sqlx::query(
             r#"
@@ -148,11 +147,11 @@ impl Database {
         .bind(&transaction.bank)
         .fetch_one(&self.pool)
         .await?;
-        
+
         let count: i64 = result.get("count");
         Ok(count > 0)
     }
-    
+
     pub async fn get_transactions(
         &self,
         r#type: Option<&str>,
@@ -162,36 +161,36 @@ impl Database {
     ) -> Result<Vec<Transaction>> {
         let mut query = "SELECT * FROM transactions WHERE 1=1".to_string();
         let mut params: Vec<String> = Vec::new();
-        
+
         if let Some(r#type) = r#type {
             query.push_str(" AND type = ?");
             params.push(r#type.to_string());
         }
-        
+
         if let Some(from) = from {
             query.push_str(" AND date >= ?");
             params.push(from.to_string());
         }
-        
+
         if let Some(to) = to {
             query.push_str(" AND date <= ?");
             params.push(to.to_string());
         }
-        
+
         query.push_str(" ORDER BY date DESC, created_at DESC");
-        
+
         if let Some(limit) = limit {
             query.push_str(&format!(" LIMIT {}", limit));
         }
-        
+
         let mut query_builder = sqlx::query_as::<_, TransactionRow>(&query);
-        
+
         for param in params {
             query_builder = query_builder.bind(param);
         }
-        
+
         let rows = query_builder.fetch_all(&self.pool).await?;
-        
+
         let transactions = rows
             .into_iter()
             .map(|row| Transaction {
@@ -208,17 +207,17 @@ impl Database {
                 created_at: DateTime::from_str(&row.created_at).unwrap_or(Local::now()),
             })
             .collect();
-        
+
         Ok(transactions)
     }
-    
+
     pub async fn get_summary(&self, period: &str, date: Option<&str>) -> Result<Summary> {
         let base_date = if let Some(date_str) = date {
             NaiveDate::from_str(date_str)?
         } else {
             Local::now().date_naive()
         };
-        
+
         let (start_date, end_date) = match period {
             "day" => (base_date, base_date),
             "week" => {
@@ -246,7 +245,7 @@ impl Database {
             }
             _ => (base_date, base_date),
         };
-        
+
         // Get total transactions
         let total_result = sqlx::query(
             r#"
@@ -262,12 +261,12 @@ impl Database {
         .bind(end_date.to_string())
         .fetch_one(&self.pool)
         .await?;
-        
+
         let total_transactions: i64 = total_result.get("total_count");
         let total_in: f64 = total_result.get("total_in");
         let total_out: f64 = total_result.get("total_out");
         let net_balance = total_in - total_out;
-        
+
         // Get top categories (simplified - using first word of description)
         let category_result = sqlx::query(
             r#"
@@ -285,7 +284,7 @@ impl Database {
         .bind(end_date.to_string())
         .fetch_all(&self.pool)
         .await?;
-        
+
         let top_categories = category_result
             .iter()
             .map(|row| {
@@ -294,7 +293,7 @@ impl Database {
                 (category, amount)
             })
             .collect();
-        
+
         Ok(Summary {
             total_transactions,
             total_in,

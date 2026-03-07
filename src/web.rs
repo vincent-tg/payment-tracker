@@ -1,9 +1,4 @@
-use axum::{
-    routing::get,
-    Router,
-    response::Json,
-    http::StatusCode,
-};
+use axum::{Router, http::StatusCode, response::Json, routing::get};
 use serde_json::json;
 use std::net::SocketAddr;
 
@@ -13,14 +8,11 @@ pub async fn start_health_server(port: u16) -> anyhow::Result<()> {
         .route("/", get(root));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
-    
+
     println!("🌐 Health server starting on http://0.0.0.0:{}", port);
-    
-    axum::serve(
-        tokio::net::TcpListener::bind(addr).await?,
-        app
-    ).await?;
-    
+
+    axum::serve(tokio::net::TcpListener::bind(addr).await?, app).await?;
+
     Ok(())
 }
 
@@ -32,7 +24,7 @@ async fn health_check() -> (StatusCode, Json<serde_json::Value>) {
         "version": env!("CARGO_PKG_VERSION"),
         "features": ["vib-bank", "currency-tracking", "postgresql", "email-parsing"]
     });
-    
+
     (StatusCode::OK, Json(response))
 }
 
@@ -45,6 +37,6 @@ async fn root() -> (StatusCode, Json<serde_json::Value>) {
             "description": "Specialized for VIB bank transactions with currency tracking"
         }
     });
-    
+
     (StatusCode::OK, Json(response))
 }

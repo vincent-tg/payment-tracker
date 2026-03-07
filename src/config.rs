@@ -92,7 +92,7 @@ impl Default for Config {
 impl Config {
     pub fn load() -> Result<Self> {
         let config_path = Self::config_path();
-        
+
         if Path::new(&config_path).exists() {
             let content = fs::read_to_string(&config_path)?;
             let mut config: Config = toml::from_str(&content)?;
@@ -104,12 +104,12 @@ impl Config {
             Ok(config)
         }
     }
-    
+
     fn apply_provider_settings(&mut self) {
         if let Some(ref provider) = self.email.provider {
             let provider_type = EmailProvider::from_provider_name(provider);
             let (server, port) = provider_type.get_imap_settings();
-            
+
             if self.email.imap_server.is_empty() || self.email.imap_server == "imap.example.com" {
                 self.email.imap_server = server.to_string();
             }
@@ -118,14 +118,14 @@ impl Config {
             }
         }
     }
-    
+
     pub fn save(&self) -> Result<()> {
         let config_path = Self::config_path();
         let content = toml::to_string_pretty(self)?;
         fs::write(config_path, content)?;
         Ok(())
     }
-    
+
     fn config_path() -> String {
         let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
         format!("{}/.payment-tracker/config.toml", home)

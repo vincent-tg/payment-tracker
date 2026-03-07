@@ -3,7 +3,7 @@ use payment_tracker::email;
 fn main() -> anyhow::Result<()> {
     println!("Testing VIB Bank Email Parser with Currency Tracking");
     println!("====================================================\n");
-    
+
     // Sample VIB bank email (simplified)
     let vib_email = r#"From: VIB Bank <noreply@vib.com.vn>
 Subject: Thông báo giao dịch thẻ
@@ -24,10 +24,10 @@ Content-Transfer-Encoding: quoted-printable
 </div>
 </body>
 </html>"#;
-    
+
     println!("Parsing VIB Bank Email:");
     println!("-----------------------");
-    
+
     match email::parse_transaction_from_email(vib_email) {
         Some(transaction) => {
             println!("✅ SUCCESS: Transaction parsed!");
@@ -39,7 +39,7 @@ Content-Transfer-Encoding: quoted-printable
             println!("  Type: {}", transaction.r#type);
             println!("  Description: {}", transaction.description);
             println!("  Date: {}", transaction.date);
-            
+
             // Verify it's correct
             println!("\n✅ Verification:");
             if transaction.bank == "VIB" {
@@ -57,7 +57,7 @@ Content-Transfer-Encoding: quoted-printable
             if transaction.description.contains("7ELEVEN") {
                 println!("  ✓ Merchant correctly extracted: 7ELEVEN");
             }
-            
+
             println!("\n🎉 VIB Bank email parser is working correctly!");
             println!("   - Tracks currency (VND)");
             println!("   - Converts to USD (≈${:.2})", transaction.to_usd());
@@ -68,11 +68,11 @@ Content-Transfer-Encoding: quoted-printable
             println!("❌ FAILED: Could not parse transaction from email");
         }
     }
-    
+
     // Test another email format
     println!("\n\nTesting Another VIB Email Format:");
     println!("----------------------------------");
-    
+
     let vib_email2 = r#"From: VIB <no-reply@vib.com.vn>
 Subject: Giao dịch thẻ thành công
 Content-Type: text/plain
@@ -88,14 +88,19 @@ Giao dịch thẻ của bạn đã được thực hiện thành công.
 
 Trân trọng,
 VIB Bank"#;
-    
+
     match email::parse_transaction_from_email(vib_email2) {
         Some(t) => {
             println!("✅ Parsed: {} at {}", t.format_amount(), t.description);
-            println!("  Bank: {}, Type: {}, USD: ${:.2}", t.bank, t.r#type, t.to_usd());
+            println!(
+                "  Bank: {}, Type: {}, USD: ${:.2}",
+                t.bank,
+                t.r#type,
+                t.to_usd()
+            );
         }
         None => println!("❌ Could not parse second email"),
     }
-    
+
     Ok(())
 }

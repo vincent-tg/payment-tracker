@@ -3,7 +3,7 @@ use payment_tracker::email;
 fn main() {
     println!("Testing Payment Tracker Email Parsing Improvements");
     println!("=================================================\n");
-    
+
     // Test 1: Plain text email
     println!("1. Testing Plain Text Email Parsing:");
     let plain_email = r#"Subject: Transaction Alert - Debit
@@ -22,7 +22,7 @@ Transaction Type: DEBITED
 
 Thank you,
 Your Bank"#;
-    
+
     match email::parse_transaction_from_email(plain_email) {
         Some(t) => {
             println!("   ✓ Successfully parsed transaction!");
@@ -33,7 +33,7 @@ Your Bank"#;
         }
         None => println!("   ✗ Failed to parse plain text email"),
     }
-    
+
     println!("\n2. Testing HTML Email Parsing:");
     let html_email = r#"Subject: Your Chase Credit Card Transaction
 From: chase@alerts.chase.com
@@ -61,7 +61,7 @@ Content-Type: text/html; charset=utf-8
 </html>
 
 --boundary123--"#;
-    
+
     match email::parse_transaction_from_email(html_email) {
         Some(t) => {
             println!("   ✓ Successfully parsed HTML transaction!");
@@ -71,7 +71,7 @@ Content-Type: text/html; charset=utf-8
         }
         None => println!("   ✗ Failed to parse HTML email"),
     }
-    
+
     println!("\n3. Testing Different Amount Formats:");
     let formats = [
         ("Amount: $1,234.56", "Standard format"),
@@ -80,7 +80,7 @@ Content-Type: text/html; charset=utf-8
         ("Transaction for 75.00", "No currency symbol"),
         ("USD 200.00 charged", "Currency code format"),
     ];
-    
+
     for (email_body, description) in formats.iter() {
         let test_email = format!("Content-Type: text/plain\n\n{}", email_body);
         if let Some(t) = email::parse_transaction_from_email(&test_email) {
@@ -89,6 +89,6 @@ Content-Type: text/html; charset=utf-8
             println!("   ✗ {}: failed to parse", description);
         }
     }
-    
+
     println!("\n✅ Email parsing improvements are working!");
 }
