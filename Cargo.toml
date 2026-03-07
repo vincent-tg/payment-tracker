@@ -23,7 +23,7 @@ tabled = { version = "0.14", features = ["derive"] }
 toml = "0.8"
 imap = "2.1.0"
 mailparse = "0.14"
-native-tls = "0.2"
+native-tls = { version = "0.2", features = ["vendored"] }
 base64 = "0.21"
 axum = "0.7"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
