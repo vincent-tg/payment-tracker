@@ -99,15 +99,14 @@ jobs:
     
     - name: Deploy to k3s
       run: |
-        # Update image in deployment
+        # Apply configs and deployment architecture first
+        kubectl apply -f k8s/payment-tracker.yaml -n default
+        
+        # Update existing/new deployment with the latest image built from GHCR
         kubectl set image deployment/payment-tracker payment-tracker=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest -n default
         
-        # Wait for rollout
+        # Wait for the Kubernetes rollout to finish
         kubectl rollout status deployment/payment-tracker -n default --timeout=300s
-        
-        # Restart cronjob to use new image
-        kubectl delete cronjob payment-tracker-daily -n default --ignore-not-found
-        kubectl apply -f k8s/payment-tracker.yaml -n default
         
         echo "✅ Deployment successful!"
     
