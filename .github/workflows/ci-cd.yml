@@ -37,6 +37,22 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y libssl-dev pkg-config
     
+    - name: Set up PostgreSQL for tests
+      run: |
+        # Deploy PostgreSQL to k3s
+        kubectl apply -f k8s/postgresql.yaml -n default
+        
+        # Wait for PostgreSQL to be ready
+        echo "Waiting for PostgreSQL to be ready..."
+        kubectl wait --for=condition=ready pod -l app=postgres -n default --timeout=120s
+        
+        # Check PostgreSQL status
+        kubectl get pods -n default
+        kubectl get svc -n default
+        
+        # Set environment variables for tests
+        echo "DATABASE_URL=postgres://payment_user:payment_password@postgres.default.svc.cluster.local:5432/payment_tracker" >> $GITHUB_ENV
+    
     - name: Run tests
       run: cargo test --verbose
     
@@ -86,16 +102,6 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         platforms: linux/arm64
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-  deploy-to-k3s:
-    needs: build-and-push
-    runs-on: [self-hosted, k3s, linux, arm64]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
     
     - name: Verify k3s kubectl access
       run: |
