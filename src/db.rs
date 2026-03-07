@@ -309,12 +309,10 @@ impl Database {
     }
 
     pub async fn get_transaction_by_id(&self, id: i64) -> Result<Option<Transaction>> {
-        let row = sqlx::query_as::<_, TransactionRow>(
-            "SELECT * FROM transactions WHERE id = $1",
-        )
-        .bind(id)
-        .fetch_optional(&self.pool)
-        .await?;
+        let row = sqlx::query_as::<_, TransactionRow>("SELECT * FROM transactions WHERE id = $1")
+            .bind(id)
+            .fetch_optional(&self.pool)
+            .await?;
 
         Ok(row.map(|row| Transaction {
             id: row.id,
