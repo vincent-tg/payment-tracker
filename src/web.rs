@@ -240,10 +240,8 @@ pub async fn start_health_server(port: u16) -> anyhow::Result<()> {
 // ---------------------------------------------------------------------------
 
 async fn health_check(State(state): State<SharedState>) -> impl IntoResponse {
-    // Basic DB connectivity test – SELECT 1
-    let db_status = match sqlx::query("SELECT 1")
-        .fetch_one(&state.db.pool)
-        .await {
+    // Basic DB connectivity test – SELECT 1 via ping()
+    let db_status = match state.db.ping().await {
         Ok(_) => "ok",
         Err(e) => {
             tracing::error!(error = %e, "Database health check failed");
