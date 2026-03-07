@@ -1,158 +1,209 @@
-# Payment Tracker
+# VIB Payment Tracker
 
-A Rust application for tracking payment cash in/out by parsing bank transaction emails.
+A Rust application for tracking payment cash in/out by parsing bank emails, with a focus on VIB (Vietnam International Bank) transactions.
 
 ## Features
 
-- **Email Integration**: Connect to IMAP email servers to fetch bank transaction emails
-- **Transaction Parsing**: Automatically parse transaction details from email content
-- **Database Storage**: Store transactions in SQLite database
-- **CLI Interface**: Easy-to-use command-line interface
-- **Reporting**: Generate summaries and reports
-- **Manual Entry**: Add transactions manually when needed
+- **Email Parsing**: Automatically fetch and parse transaction emails from VIB bank
+- **Multi-Currency Support**: Track transactions in VND, USD, and other currencies
+- **PostgreSQL Storage**: Store transactions in a PostgreSQL database
+- **REST API**: Health endpoints and transaction API via Axum web server
+- **CLI Interface**: Command-line interface for manual operations
+- **CI/CD Pipeline**: Automated testing, Docker builds, and k3s deployment
+- **Daily Tracking**: Scheduled daily email processing
 
-## Installation
+## Architecture
+
+```
+payment-tracker/
+├── src/                    # Rust source code
+│   ├── main.rs            # CLI entry point
+│   ├── lib.rs             # Library exports
+│   ├── config.rs          # Configuration management
+│   ├── currency.rs        # Currency conversion and formatting
+│   ├── db.rs              # PostgreSQL database operations
+│   ├── email.rs           # Email fetching and parsing
+│   ├── models.rs          # Data structures (Transaction, etc.)
+│   └── web.rs             # Web server and health endpoints
+├── examples/bin/          # Example programs
+├── tests/                 # Unit and integration tests
+├── docs/                  # Documentation
+├── scripts/               # Deployment and utility scripts
+├── configs/               # Configuration files
+├── emails/                # Sample email files
+├── k8s/                   # Kubernetes manifests
+└── .github/workflows/     # GitHub Actions CI/CD
+```
+
+## Quick Start
 
 ### Prerequisites
 
-- Rust and Cargo (install via [rustup](https://rustup.rs/))
-- SQLite development libraries
+- Rust 1.70+ (`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`)
+- PostgreSQL 14+
+- Docker (for containerization)
 
-### Build from Source
+### Installation
 
 ```bash
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/vincent-tg/payment-tracker.git
 cd payment-tracker
+
+# Build the application
 cargo build --release
+
+# Copy example configuration
+cp configs/.env.example configs/.env
+cp configs/config_example.toml config.toml
+
+# Edit configuration files with your settings
+# - config.toml: Database and email settings
+# - configs/.env: Email app password
 ```
 
-The binary will be available at `target/release/payment-tracker`.
+### Configuration
 
-## Configuration
+1. **Email Setup**:
+   - Enable IMAP access in your email provider
+   - Generate an app password (not your regular password)
+   - Update `config.toml` with your email settings
 
-First, configure the application with your email and database settings:
+2. **Database Setup**:
+   ```bash
+   # Initialize PostgreSQL database
+   cargo run -- init
+   ```
+
+### Usage
 
 ```bash
-# Configure email settings
-payment-tracker config \
-  --email your-email@gmail.com \
-  --password your-app-password \
-  --imap-server imap.gmail.com \
-  --imap-port 993 \
-  --database payments.db
+# Fetch and process new emails
+cargo run -- fetch
+
+# List transactions
+cargo run -- list
+
+# Add manual transaction
+cargo run -- add --amount 100.0 --description "Coffee" --type out
+
+# Generate summary report
+cargo run -- summary --period month
+
+# Start web server
+cargo run -- serve --port 8080
+
+# Run daily tracking
+cargo run -- daily
 ```
 
-**Note for Gmail users**: You need to use an "App Password" instead of your regular password. Enable 2-factor authentication and generate an app password from your Google account settings.
+## Development
 
-## Usage
-
-### Initialize Database
+### Running Tests
 
 ```bash
-payment-tracker init
+# Run all tests
+cargo test
+
+# Run specific test module
+cargo test --lib
+
+# Run with verbose output
+cargo test -- --nocapture
 ```
 
-### Fetch and Process Emails
+### Building Examples
 
 ```bash
-payment-tracker fetch
+# Build all examples
+cargo build --examples
+
+# Run specific example
+cargo run --example daily_vib_tracker
 ```
 
-This will connect to your email server, fetch unread emails from the last 7 days, parse any bank transactions, and store them in the database.
+## Deployment
 
-### List Transactions
+### Docker
 
 ```bash
-# List all transactions
-payment-tracker list
+# Build Docker image
+docker build -t payment-tracker .
 
-# List only income transactions
-payment-tracker list --type in
-
-# List transactions from a specific date range
-payment-tracker list --from 2024-01-01 --to 2024-01-31
-
-# List last 10 transactions
-payment-tracker list --limit 10
+# Run container
+docker run -p 8080:8080 --env-file configs/.env payment-tracker
 ```
 
-### Generate Summary Reports
+### Kubernetes (k3s)
 
 ```bash
-# Monthly summary (default)
-payment-tracker summary
+# Apply Kubernetes manifests
+kubectl apply -f k8s/
 
-# Weekly summary
-payment-tracker summary --period week
-
-# Daily summary
-payment-tracker summary --period day
-
-# Yearly summary
-payment-tracker summary --period year
-
-# Summary for specific date
-payment-tracker summary --date 2024-01-15
+# Check deployment status
+kubectl get pods -n default
 ```
 
-### Add Manual Transactions
+### CI/CD Pipeline
 
-```bash
-# Add an income transaction
-payment-tracker add --amount 1000.00 --description "Salary" --type in
+The project includes GitHub Actions workflow for:
+- Automated testing on ARM64
+- Docker image building and pushing to GitHub Container Registry
+- Automatic deployment to k3s cluster
 
-# Add an expense transaction
-payment-tracker add --amount 50.00 --description "Groceries" --type out --date 2024-01-15
-```
+## Project Structure Details
 
-## Email Parsing
+### Core Modules
 
-The application uses regex patterns to parse common bank transaction email formats. It looks for:
+- **`src/config.rs`**: Configuration management with TOML files
+- **`src/currency.rs`**: Currency conversion and formatting utilities
+- **`src/db.rs`**: PostgreSQL operations with SQLx
+- **`src/email.rs`**: IMAP email fetching and transaction parsing
+- **`src/models.rs`**: Data models with serialization support
+- **`src/web.rs`**: Axum web server with health endpoints
 
-- Transaction amounts (with currency symbols)
-- Dates in various formats
-- Descriptions/merchant names
-- Transaction types (credited/debited)
+### Email Parsing
 
-Currently supported patterns include common formats from major banks. You may need to adjust the regex patterns in `src/email.rs` for your specific bank's email format.
+The application specializes in parsing VIB bank emails with support for:
+- VND currency formatting
+- Vietnamese language transaction descriptions
+- Multi-part MIME email parsing
+- Base64 and quoted-printable decoding
 
-## Database Schema
-
-The SQLite database has a single table:
+### Database Schema
 
 ```sql
 CREATE TABLE transactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     date DATE NOT NULL,
     description TEXT NOT NULL,
-    amount REAL NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('in', 'out')),
-    source TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(date, description, amount, type)
+    amount DECIMAL(10, 2) NOT NULL,
+    currency VARCHAR(10) NOT NULL,
+    type VARCHAR(10) NOT NULL,  -- 'in' or 'out'
+    source VARCHAR(20) NOT NULL, -- 'email' or 'manual'
+    bank VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(100),
+    email_message_id VARCHAR(100),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 ```
 
-## Security Considerations
+## Contributing
 
-1. **Email Credentials**: Your email password is stored in plain text in the config file. Use app-specific passwords where possible.
-2. **Database**: The SQLite database file is not encrypted. Consider encrypting sensitive data if needed.
-3. **Config File**: The config file is stored at `~/.payment-tracker/config.toml`.
-
-## Extending
-
-### Adding New Email Parsers
-
-To add support for a new bank's email format, modify the `parse_bank_transaction` function in `src/email.rs` to include new regex patterns for that bank's specific format.
-
-### Adding Reports
-
-Add new report types by extending the `App` struct's methods and adding corresponding CLI commands.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Contributing
+## Acknowledgments
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+- Built with Rust for performance and safety
+- Uses SQLx for type-safe SQL queries
+- Axum for async web server
+- Chrono for date/time handling
+- Clap for command-line parsing

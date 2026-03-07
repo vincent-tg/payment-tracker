@@ -1,109 +1,92 @@
-# Makefile for Payment Tracker
+# Payment Tracker Makefile
 
-.PHONY: help build test run clean docker-build docker-run k3s-deploy k3s-clean
+.PHONY: help build test clean run docker deploy
 
 # Default target
 help:
-	@echo "Payment Tracker - Available commands:"
-	@echo ""
-	@echo "Development:"
-	@echo "  build        - Build the application"
-	@echo "  test         - Run tests"
-	@echo "  run          - Run the application locally"
-	@echo "  clean        - Clean build artifacts"
-	@echo ""
-	@echo "Docker:"
-	@echo "  docker-build - Build Docker image"
-	@echo "  docker-run   - Run with Docker Compose"
-	@echo ""
-	@echo "Kubernetes/k3s:"
-	@echo "  k3s-deploy   - Deploy to k3s cluster"
-	@echo "  k3s-clean    - Clean up k3s deployment"
-	@echo ""
-	@echo "GitHub:"
-	@echo "  github-init  - Initialize git repository"
-	@echo "  github-push  - Push to GitHub"
+	@echo "Payment Tracker - Available targets:"
+	@echo "  build     - Build the project"
+	@echo "  test      - Run tests"
+	@echo "  clean     - Clean build artifacts"
+	@echo "  run       - Run the application"
+	@echo "  docker    - Build Docker image"
+	@echo "  deploy    - Deploy to k3s"
+	@echo "  fmt       - Format code"
+	@echo "  clippy    - Run clippy linter"
+	@echo "  docs      - Generate documentation"
 
-# Development commands
+# Build targets
 build:
 	cargo build --release
 
+build-dev:
+	cargo build
+
+# Test targets
 test:
+	cargo test --lib
+
+test-all:
 	cargo test
 
-run:
-	cargo run -- --help
+test-verbose:
+	cargo test -- --nocapture
 
-clean:
-	cargo clean
-	rm -rf target/
-
-# Docker commands
-docker-build:
-	docker build -t payment-tracker:latest .
-
-docker-run:
-	docker-compose up -d
-
-# k3s commands
-k3s-deploy:
-	@echo "Deploying to k3s..."
-	@cd k8s && chmod +x setup-k3s.sh && ./setup-k3s.sh
-
-k3s-clean:
-	@echo "Cleaning up k3s deployment..."
-	kubectl delete -f k8s/
-
-# GitHub commands
-github-init:
-	@echo "Initializing git repository..."
-	git init
-	git add .
-	git commit -m "Initial commit: Payment Tracker application"
-	@echo "Repository initialized. Run 'git remote add origin <your-repo-url>' to add remote"
-
-github-push:
-	@echo "Pushing to GitHub..."
-	git push -u origin main
-
-# Utility commands
-lint:
+# Code quality
+fmt:
 	cargo fmt --all
+
+clippy:
 	cargo clippy -- -D warnings
 
 check:
 	cargo check
 
-bench:
-	cargo bench
+# Documentation
+docs:
+	cargo doc --open
 
-# Database commands
-db-init:
-	./target/release/payment-tracker init
+# Cleanup
+clean:
+	cargo clean
+	rm -f config.toml
 
-db-list:
-	./target/release/payment-tracker list
+# Run targets
+run:
+	cargo run -- fetch
 
-db-add-example:
-	@echo "Adding example transactions..."
-	./target/release/payment-tracker add --amount 1000 --description "Salary" --type in
-	./target/release/payment-tracker add --amount 50 --description "Groceries" --type out
-	./target/release/payment-tracker add --amount 25 --description "Coffee" --type out
+run-cli:
+	cargo run -- $(ARGS)
 
-db-summary:
-	./target/release/payment-tracker summary --period month
+serve:
+	cargo run -- serve
 
-# Build for different architectures
-build-linux:
-	cargo build --release --target x86_64-unknown-linux-musl
+daily:
+	cargo run -- daily
 
-build-arm:
-	cargo build --release --target aarch64-unknown-linux-musl
+# Docker targets
+docker:
+	docker build -t payment-tracker .
 
-# Release preparation
-release: build-linux build-arm
-	@echo "Creating release artifacts..."
-	mkdir -p release
-	cp target/x86_64-unknown-linux-musl/release/payment-tracker release/payment-tracker-x86_64
-	cp target/aarch64-unknown-linux-musl/release/payment-tracker release/payment-tracker-arm64
-	@echo "Release artifacts created in release/ directory"
+docker-run:
+	docker run -p 8080:8080 --env-file configs/.env payment-tracker
+
+# Deployment targets
+deploy:
+	./scripts/deploy-to-k3s.sh
+
+# Development setup
+setup:
+	cp configs/.env.example configs/.env
+	cp configs/config_example.toml config.toml
+	@echo "Please edit config.toml and configs/.env with your settings"
+
+init-db:
+	cargo run -- init
+
+# Examples
+examples:
+	cargo build --examples
+
+run-example:
+	cargo run --example $(EXAMPLE)

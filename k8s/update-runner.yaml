@@ -1,0 +1,25 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: github-runner
+  namespace: actions-runner-system
+spec:
+  replicas: 1
+  template:
+    spec:
+      repository: vincent-tg/payment-tracker
+      labels:
+        - self-hosted
+        - linux
+        - k3s
+        - arm64
+      dockerdWithinRunnerContainer: true
+      image: summerwind/actions-runner:latest
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: "1"
+          memory: "2Gi"
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
