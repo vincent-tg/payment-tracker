@@ -99,6 +99,7 @@ enum Commands {
     
     /// Run daily VIB bank tracking
     Daily,
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
