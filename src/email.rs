@@ -496,7 +496,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
     Some(Transaction::from_email(date, description, amount, currency, r#type, bank, transaction_id, email_message_id))
 }
 
-fn extract_email_body(parsed_mail: &ParsedMail) -> String {
+pub fn extract_email_body(parsed_mail: &ParsedMail) -> String {
     let mut best_body = String::new();
     let mut html_body = String::new();
     
