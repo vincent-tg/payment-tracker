@@ -55,6 +55,8 @@ Content-Type: text/html; charset=UTF-8
             r#type: "out".to_string(),
             source: "demo".to_string(),
             bank: "VIB".to_string(),
+            transaction_id: None,
+            email_message_id: None,
             created_at: chrono::Local::now(),
         };
         

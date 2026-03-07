@@ -31,6 +31,8 @@ async fn main() -> anyhow::Result<()> {
         r#type: "out".to_string(),
         source: "test".to_string(),
         bank: "VIB".to_string(),
+        transaction_id: None,
+        email_message_id: None,
         created_at: chrono::Local::now(),
     };
     
