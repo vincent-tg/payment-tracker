@@ -124,7 +124,7 @@ spec:
             image: ghcr.io/vincent-tg/payment-tracker:latest
             imagePullPolicy: Always
             command: ["/app/docker-entrypoint.sh"]
-            args: ["daily"]
+            args: ["/app/payment-tracker", "daily"]
             env:
             - name: DATABASE_URL
               valueFrom:
