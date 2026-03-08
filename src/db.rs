@@ -223,10 +223,7 @@ impl Database {
                 bank: row.bank,
                 transaction_id: row.transaction_id,
                 email_message_id: row.email_message_id,
-                created_at: row
-                    .created_at
-                    .and_local_timezone(Local)
-                    .unwrap(),
+                created_at: row.created_at.and_local_timezone(Local).unwrap(),
             })
             .collect();
 
@@ -350,10 +347,7 @@ impl Database {
             bank: row.bank,
             transaction_id: row.transaction_id,
             email_message_id: row.email_message_id,
-            created_at: row
-                .created_at
-                .and_local_timezone(Local)
-                .unwrap(),
+            created_at: row.created_at.and_local_timezone(Local).unwrap(),
         }))
     }
 
