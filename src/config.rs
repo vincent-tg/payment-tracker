@@ -98,8 +98,10 @@ impl Config {
             let content = fs::read_to_string(&config_path)?;
             let mut config: Config = toml::from_str(&content)?;
             config.apply_provider_settings();
-            // Override database connection string from environment if provided 
-            if let Ok(db_url) = env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING")) {
+            // Override database connection string from environment if provided
+            if let Ok(db_url) =
+                env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING"))
+            {
                 config.database.connection_string = Some(db_url);
             }
             if let Ok(email) = env::var("EMAIL_ADDRESS") {
@@ -120,7 +122,9 @@ impl Config {
         } else {
             let mut config = Config::default();
             // Override with env var if present even for fresh config
-            if let Ok(db_url) = env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING")) {
+            if let Ok(db_url) =
+                env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING"))
+            {
                 config.database.connection_string = Some(db_url);
             }
             if let Ok(email) = env::var("EMAIL_ADDRESS") {
@@ -175,7 +179,7 @@ impl Config {
         if Path::new("./config.toml").exists() {
             return "./config.toml".to_string();
         }
-        
+
         // If there's an explicit /app directory but the file doesn't exist yet, we're likely in docker
         if Path::new("/app").exists() {
             return "/app/config.toml".to_string();

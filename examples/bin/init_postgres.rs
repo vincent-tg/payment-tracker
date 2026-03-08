@@ -5,9 +5,9 @@ async fn main() -> anyhow::Result<()> {
     println!("Initializing PostgreSQL database for payment tracker...");
 
     // Use the connection string from DATABASE_URL env
-    let connection_string =
-        std::env::var("DATABASE_URL").unwrap_or_else(|_| "postgres://user:pass@localhost:5432/payment_tracker".to_string());
-    
+    let connection_string = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "postgres://user:pass@localhost:5432/payment_tracker".to_string());
+
     // For logging, hide the password
     println!("Connecting to database...");
 

@@ -72,9 +72,7 @@ Content-Type: text/html; charset=UTF-8
     println!("\n3. POSTGRESQL DATABASE:");
     println!("----------------------");
     println!("   ✅ Hosted on k3s cluster");
-    println!(
-        "   ✅ Connection: postgres://payment_user:****@10.0.0.229:30432/payment_tracker"
-    );
+    println!("   ✅ Connection: postgres://payment_user:****@10.0.0.229:30432/payment_tracker");
     println!("   ✅ Schema supports currency and bank fields");
     println!("   ✅ Ready for production use");
 
