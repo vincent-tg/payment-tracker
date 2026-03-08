@@ -102,12 +102,40 @@ impl Config {
             if let Ok(db_url) = env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING")) {
                 config.database.connection_string = Some(db_url);
             }
+            if let Ok(email) = env::var("EMAIL_ADDRESS") {
+                config.email.address = email;
+            }
+            if let Ok(pass) = env::var("EMAIL_PASSWORD") {
+                config.email.password = pass;
+            }
+            if let Ok(server) = env::var("IMAP_SERVER") {
+                config.email.imap_server = server;
+            }
+            if let Ok(port) = env::var("IMAP_PORT") {
+                if let Ok(p) = port.parse() {
+                    config.email.imap_port = p;
+                }
+            }
             Ok(config)
         } else {
             let mut config = Config::default();
             // Override with env var if present even for fresh config
             if let Ok(db_url) = env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING")) {
                 config.database.connection_string = Some(db_url);
+            }
+            if let Ok(email) = env::var("EMAIL_ADDRESS") {
+                config.email.address = email;
+            }
+            if let Ok(pass) = env::var("EMAIL_PASSWORD") {
+                config.email.password = pass;
+            }
+            if let Ok(server) = env::var("IMAP_SERVER") {
+                config.email.imap_server = server;
+            }
+            if let Ok(port) = env::var("IMAP_PORT") {
+                if let Ok(p) = port.parse() {
+                    config.email.imap_port = p;
+                }
             }
             config.save()?;
             Ok(config)

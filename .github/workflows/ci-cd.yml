@@ -104,6 +104,15 @@ jobs:
           --from-literal=url="${{ env.SUPABASE_CONNECTION_STRING }}" \
           -n default --dry-run=client -o yaml | kubectl apply -f -
           
+        # Create email secret from Github Secrets
+        kubectl create secret generic email-secret \
+          --from-literal=address="${{ secrets.EMAIL_ADDRESS }}" \
+          --from-literal=password="${{ secrets.EMAIL_PASSWORD }}" \
+          --from-literal=imap_server="${{ secrets.IMAP_SERVER || 'imap.gmail.com' }}" \
+          --from-literal=imap_port="${{ secrets.IMAP_PORT || '993' }}" \
+          -n default --dry-run=client -o yaml | kubectl apply -f -
+
+          
         # Apply configs and deployment architecture first
         kubectl apply -f k8s/payment-tracker.yaml -n default
         

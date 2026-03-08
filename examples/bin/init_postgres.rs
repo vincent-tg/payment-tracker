@@ -4,11 +4,12 @@ use payment_tracker::db::Database;
 async fn main() -> anyhow::Result<()> {
     println!("Initializing PostgreSQL database for payment tracker...");
 
-    // Use the connection string from config.toml
+    // Use the connection string from DATABASE_URL env
     let connection_string =
-        "postgres://payment_user:payment_password@10.0.0.229:30432/payment_tracker";
-
-    println!("Connecting to: {}", connection_string);
+        std::env::var("DATABASE_URL").unwrap_or_else(|_| "postgres://user:pass@localhost:5432/payment_tracker".to_string());
+    
+    // For logging, hide the password
+    println!("Connecting to database...");
 
     // Initialize database
     Database::init_database(connection_string).await?;

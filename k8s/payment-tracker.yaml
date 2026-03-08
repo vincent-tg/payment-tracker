@@ -5,23 +5,10 @@ metadata:
 data:
   config.toml: |
     [email]
-    address = "baotg.fin@gmail.com"
-    password = "tfme vicd wwkx iafg"
-    imap_server = "imap.gmail.com"
-    imap_port = 993
-
+    
     [database]
     path = "payments.db"
     # The DB connection string is now provided via the SUPABASE_DB_URL secret.
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: payment-tracker-secrets
-type: Opaque
-stringData:
-  email-password: "tfme vicd wwkx iafg"
-  postgres-password: "payment_password"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -53,6 +40,30 @@ spec:
             secretKeyRef:
               name: supabase-secret
               key: url
+        - name: EMAIL_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: email-secret
+              key: address
+              optional: true
+        - name: EMAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: email-secret
+              key: password
+              optional: true
+        - name: IMAP_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: email-secret
+              key: imap_server
+              optional: true
+        - name: IMAP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: email-secret
+              key: imap_port
+              optional: true
         volumeMounts:
         - name: config-volume
           mountPath: /app/config.toml
@@ -115,6 +126,30 @@ spec:
                 secretKeyRef:
                   name: supabase-secret
                   key: url
+            - name: EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: email-secret
+                  key: address
+                  optional: true
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: email-secret
+                  key: password
+                  optional: true
+            - name: IMAP_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: email-secret
+                  key: imap_server
+                  optional: true
+            - name: IMAP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: email-secret
+                  key: imap_port
+                  optional: true
             volumeMounts:
             - name: config-volume
               mountPath: /app/config.toml

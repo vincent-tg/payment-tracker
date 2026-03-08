@@ -27,13 +27,13 @@
   - Service: `postgres` (ClusterIP: 10.43.153.153:5432)
   - NodePort: `postgres-nodeport` (10.0.0.229:30432)
   - Database: `payment_tracker`
-  - User: `payment_user` / Password: `payment_password`
+  - User: `payment_user` / Password: `****`
 
 - **Database schema updated**:
   - Added `currency` and `bank` columns
   - Changed from SQLite to PostgreSQL
   - Updated SQL syntax (SERIAL, DOUBLE PRECISION, ON CONFLICT)
-  - Connection string: `postgres://payment_user:payment_password@10.0.0.229:30432/payment_tracker`
+  - Connection string: `postgres://payment_user:****@10.0.0.229:30432/payment_tracker`
 
 ## 📊 **Example: VIB Bank Transaction**
 

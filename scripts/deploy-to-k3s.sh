@@ -30,18 +30,8 @@ sudo k3s kubectl apply -f k8s/postgresql-existing.yaml -n payment-tracker
 echo "⏳ Waiting for PostgreSQL to be ready..."
 sudo k3s kubectl wait --for=condition=ready pod -l app=postgres -n payment-tracker --timeout=120s
 
-# Create secrets
-echo "🔐 Creating secrets..."
-cat <<EOF | sudo k3s kubectl apply -n payment-tracker -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: payment-tracker-secrets
-type: Opaque
-stringData:
-  email-password: "tfme vicd wwkx iafg"
-  postgres-password: "payment_password"
-EOF
+# Note: Secrets should be created separately or injected in CI.
+# e.g., kubectl create secret generic email-secret --from-literal=address=$EMAIL_ADDRESS ...
 
 # Create config map
 echo "📝 Creating config map..."
