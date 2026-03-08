@@ -184,13 +184,13 @@ impl Database {
 
         if let Some(from) = from {
             param_count += 1;
-            query.push_str(&format!(" AND date >= ${}", param_count));
+            query.push_str(&format!(" AND date >= ${}::date", param_count));
             params.push(from.to_string());
         }
 
         if let Some(to) = to {
             param_count += 1;
-            query.push_str(&format!(" AND date <= ${}", param_count));
+            query.push_str(&format!(" AND date <= ${}::date", param_count));
             params.push(to.to_string());
         }
 
@@ -198,7 +198,7 @@ impl Database {
 
         if let Some(limit) = limit {
             param_count += 1;
-            query.push_str(&format!(" LIMIT ${}", param_count));
+            query.push_str(&format!(" LIMIT ${}::bigint", param_count));
             params.push(limit.to_string());
         }
 
