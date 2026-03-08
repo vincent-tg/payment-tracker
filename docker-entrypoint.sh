@@ -19,7 +19,7 @@ case "${1}" in
     /app/payment-tracker)
         shift
         case "${1}" in
-            serve|daily|fetch|init)
+            serve|api|daily|fetch|init)
                 echo "📦 Initializing database..."
                 /app/payment-tracker init || echo "⚠️  Database init skipped (may already exist)"
                 ;;

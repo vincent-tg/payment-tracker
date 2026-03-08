@@ -5,6 +5,10 @@ metadata:
 data:
   config.toml: |
     [email]
+    address = "placeholder"
+    password = "placeholder"
+    imap_server = "imap.gmail.com"
+    imap_port = 993
     
     [database]
     path = "payments.db"
@@ -29,6 +33,7 @@ spec:
       containers:
       - name: payment-tracker
         image: ghcr.io/vincent-tg/payment-tracker:latest
+        args: ["/app/payment-tracker", "api"]
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
