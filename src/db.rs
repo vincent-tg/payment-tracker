@@ -35,7 +35,7 @@ impl Database {
         sqlx::query(
             r#"
             CREATE TABLE IF NOT EXISTS transactions (
-                id SERIAL PRIMARY KEY,
+                id BIGSERIAL PRIMARY KEY,
                 date DATE NOT NULL,
                 description TEXT NOT NULL,
                 amount DOUBLE PRECISION NOT NULL,
@@ -212,32 +212,23 @@ impl Database {
 
         let transactions = rows
             .into_iter()
-            .map(|row| {
-                let date = NaiveDate::from_str(&row.date).with_context(|| {
-                    format!("Invalid date in DB row id={}: {}", row.id, row.date)
-                })?;
-                let created_at = DateTime::from_str(&row.created_at).with_context(|| {
-                    format!(
-                        "Invalid created_at in DB row id={}: {}",
-                        row.id, row.created_at
-                    )
-                })?;
-
-                Ok(Transaction {
-                    id: row.id,
-                    date,
-                    description: row.description,
-                    amount: row.amount,
-                    currency: row.currency,
-                    r#type: row.r#type,
-                    source: row.source,
-                    bank: row.bank,
-                    transaction_id: row.transaction_id,
-                    email_message_id: row.email_message_id,
-                    created_at,
-                })
+            .map(|row| Transaction {
+                id: row.id,
+                date: row.date,
+                description: row.description,
+                amount: row.amount,
+                currency: row.currency,
+                r#type: row.r#type,
+                source: row.source,
+                bank: row.bank,
+                transaction_id: row.transaction_id,
+                email_message_id: row.email_message_id,
+                created_at: row
+                    .created_at
+                    .and_local_timezone(Local)
+                    .unwrap(),
             })
-            .collect::<Result<Vec<_>>>()?;
+            .collect();
 
         Ok(transactions)
     }
@@ -350,7 +341,7 @@ impl Database {
 
         Ok(row.map(|row| Transaction {
             id: row.id,
-            date: NaiveDate::from_str(&row.date).unwrap_or_else(|_| Local::now().date_naive()),
+            date: row.date,
             description: row.description,
             amount: row.amount,
             currency: row.currency,
@@ -359,7 +350,10 @@ impl Database {
             bank: row.bank,
             transaction_id: row.transaction_id,
             email_message_id: row.email_message_id,
-            created_at: DateTime::from_str(&row.created_at).unwrap_or(Local::now()),
+            created_at: row
+                .created_at
+                .and_local_timezone(Local)
+                .unwrap(),
         }))
     }
 
@@ -376,7 +370,7 @@ impl Database {
 #[derive(sqlx::FromRow)]
 struct TransactionRow {
     id: i64,
-    date: String,
+    date: NaiveDate,
     description: String,
     amount: f64,
     currency: String,
@@ -385,5 +379,5 @@ struct TransactionRow {
     bank: String,
     transaction_id: Option<String>,
     email_message_id: Option<String>,
-    created_at: String,
+    created_at: chrono::NaiveDateTime,
 }
