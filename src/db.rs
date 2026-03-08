@@ -262,8 +262,8 @@ impl Database {
             WHERE date BETWEEN $1 AND $2
             "#,
         )
-        .bind(start_date.to_string())
-        .bind(end_date.to_string())
+        .bind(start_date)
+        .bind(end_date)
         .fetch_one(&self.pool)
         .await?;
 
@@ -276,7 +276,7 @@ impl Database {
         let category_result = sqlx::query(
             r#"
             SELECT 
-                SUBSTR(description, 1, INSTR(description || ' ', ' ') - 1) as category,
+                SPLIT_PART(description, ' ', 1) as category,
                 SUM(amount) as amount
             FROM transactions
             WHERE date BETWEEN $1 AND $2 AND type = 'out'
@@ -285,8 +285,8 @@ impl Database {
             LIMIT 5
             "#,
         )
-        .bind(start_date.to_string())
-        .bind(end_date.to_string())
+        .bind(start_date)
+        .bind(end_date)
         .fetch_all(&self.pool)
         .await?;
 
