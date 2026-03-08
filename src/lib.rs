@@ -6,7 +6,7 @@ pub mod models;
 pub mod transactions;
 pub mod web;
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use config::Config;
 use db::Database;
 use email::EmailClient;
@@ -27,11 +27,18 @@ impl App {
     pub async fn fetch_and_process_emails(&self) -> Result<()> {
         println!("Connecting to email server...");
 
+        let password = self.config
+            .resolved_email_password()
+            .ok_or_else(|| anyhow!(
+                "Email password not configured. Please set {} environment variable or configure via CLI.",
+                crate::config::PASSWORD_ENV_VAR
+            ))?;
+
         let email_client = EmailClient::new(
             &self.config.email.imap_server,
             self.config.email.imap_port,
             &self.config.email.address,
-            &self.config.email.password,
+            &password,
         )?;
 
         println!("Fetching emails...");

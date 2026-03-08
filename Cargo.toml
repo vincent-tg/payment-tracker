@@ -29,6 +29,7 @@ axum = "0.7"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
+lazy_static = "1.4"
 
 [dev-dependencies]
 tempfile = "3.10"
@@ -37,17 +38,7 @@ tempfile = "3.10"
 name = "payment-tracker"
 path = "src/main.rs"
 
-[[example]]
-name = "daily_vib_tracker"
-path = "examples/bin/daily_vib_tracker.rs"
 
-[[example]]
-name = "init_postgres"
-path = "examples/bin/init_postgres.rs"
-
-[[example]]
-name = "final_demo"
-path = "examples/bin/final_demo.rs"
 
 [profile.release]
 opt-level = "z"     # Optimize for size

@@ -50,18 +50,26 @@ cd payment-tracker
 cargo build --release
 ```
 
-2. Initialize the application config and database:
+2. Initialize the application config and database (secure password flow):
 ```bash
 payment-tracker config \
   --email your-email@gmail.com \
-  --password your-app-password \
   --imap-server imap.gmail.com \
   --imap-port 993 \
   --database payments.db
 
+# Preferred: keep password out of config.toml
+export EMAIL_APP_PASSWORD="your-app-password"
+
 payment-tracker init
 ```
-*(Note for Gmail users: Use an app-specific password instead of your main password)*
+
+You can also pipe the password securely:
+```bash
+echo "your-app-password" | payment-tracker config --password-stdin
+```
+
+> ⚠️ For security, passwords are not persisted in plaintext config files. Use `EMAIL_APP_PASSWORD`.
 
 3. Fetch transaction emails:
 ```bash
@@ -72,6 +80,23 @@ payment-tracker fetch
 ```bash
 payment-tracker summary --period month
 payment-tracker list --limit 10
+```
+
+## 🟩 Supabase PostgreSQL Setup
+
+Set your Supabase connection string (preferred via env var):
+
+```bash
+export SUPABASE_CONNECTION_STRING="postgresql://postgres.<project-ref>:<password>@<host>:5432/postgres"
+# or
+export DATABASE_URL="$SUPABASE_CONNECTION_STRING"
+```
+
+Then initialize schema and verify connectivity:
+
+```bash
+payment-tracker init
+cargo run --example test_supabase_connection
 ```
 
 ## 🐳 Docker Production Setup 

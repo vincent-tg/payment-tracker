@@ -432,19 +432,33 @@ async fn fetch_emails(State(state): State<SharedState>) -> impl IntoResponse {
     let config = &state.config;
 
     // Validate email config
-    if config.email.address.is_empty() || config.email.password.is_empty() {
+    if config.email.address.trim().is_empty() {
         return api_error(
             StatusCode::BAD_REQUEST,
-            "Email not configured. Set email address and password in config.toml",
+            "Email address not configured. Set email address in config.toml or EMAIL_ADDRESS env var",
         )
         .into_response();
     }
+
+    let password = match config.resolved_email_password() {
+        Some(p) => p,
+        None => {
+            return api_error(
+                StatusCode::BAD_REQUEST,
+                format!(
+                    "Email password missing. Set {} (preferred) or EMAIL_PASSWORD environment variable.",
+                    crate::config::PASSWORD_ENV_VAR
+                ),
+            )
+            .into_response();
+        }
+    };
 
     let email_client = match EmailClient::new(
         &config.email.imap_server,
         config.email.imap_port,
         &config.email.address,
-        &config.email.password,
+        &password,
     ) {
         Ok(client) => client,
         Err(e) => {

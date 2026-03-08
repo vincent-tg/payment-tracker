@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result, anyhow};
 use chrono::{DateTime, Datelike, Local, NaiveDate};
 use sqlx::{PgPool, Row, postgres::PgPoolOptions};
 use std::str::FromStr;
@@ -174,26 +174,32 @@ impl Database {
     ) -> Result<Vec<Transaction>> {
         let mut query = "SELECT * FROM transactions WHERE 1=1".to_string();
         let mut params: Vec<String> = Vec::new();
+        let mut param_count = 0;
 
         if let Some(r#type) = r#type {
-            query.push_str(" AND type = ?");
+            param_count += 1;
+            query.push_str(&format!(" AND type = ${}", param_count));
             params.push(r#type.to_string());
         }
 
         if let Some(from) = from {
-            query.push_str(" AND date >= ?");
+            param_count += 1;
+            query.push_str(&format!(" AND date >= ${}", param_count));
             params.push(from.to_string());
         }
 
         if let Some(to) = to {
-            query.push_str(" AND date <= ?");
+            param_count += 1;
+            query.push_str(&format!(" AND date <= ${}", param_count));
             params.push(to.to_string());
         }
 
         query.push_str(" ORDER BY date DESC, created_at DESC");
 
         if let Some(limit) = limit {
-            query.push_str(&format!(" LIMIT {}", limit));
+            param_count += 1;
+            query.push_str(&format!(" LIMIT ${}", param_count));
+            params.push(limit.to_string());
         }
 
         let mut query_builder = sqlx::query_as::<_, TransactionRow>(&query);
@@ -206,20 +212,32 @@ impl Database {
 
         let transactions = rows
             .into_iter()
-            .map(|row| Transaction {
-                id: row.id,
-                date: NaiveDate::from_str(&row.date).unwrap_or_else(|_| Local::now().date_naive()),
-                description: row.description,
-                amount: row.amount,
-                currency: row.currency,
-                r#type: row.r#type,
-                source: row.source,
-                bank: row.bank,
-                transaction_id: row.transaction_id,
-                email_message_id: row.email_message_id,
-                created_at: DateTime::from_str(&row.created_at).unwrap_or(Local::now()),
+            .map(|row| {
+                let date = NaiveDate::from_str(&row.date).with_context(|| {
+                    format!("Invalid date in DB row id={}: {}", row.id, row.date)
+                })?;
+                let created_at = DateTime::from_str(&row.created_at).with_context(|| {
+                    format!(
+                        "Invalid created_at in DB row id={}: {}",
+                        row.id, row.created_at
+                    )
+                })?;
+
+                Ok(Transaction {
+                    id: row.id,
+                    date,
+                    description: row.description,
+                    amount: row.amount,
+                    currency: row.currency,
+                    r#type: row.r#type,
+                    source: row.source,
+                    bank: row.bank,
+                    transaction_id: row.transaction_id,
+                    email_message_id: row.email_message_id,
+                    created_at,
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(transactions)
     }
@@ -242,18 +260,26 @@ impl Database {
             "month" => {
                 let year = base_date.year();
                 let month = base_date.month();
-                let start = NaiveDate::from_ymd_opt(year, month, 1).unwrap();
+                let start = NaiveDate::from_ymd_opt(year, month, 1).ok_or_else(|| {
+                    anyhow!("Invalid date: year={}, month={}, day=1", year, month)
+                })?;
                 let end = if month == 12 {
-                    NaiveDate::from_ymd_opt(year + 1, 1, 1).unwrap() - chrono::Duration::days(1)
+                    NaiveDate::from_ymd_opt(year + 1, 1, 1)
+                        .ok_or_else(|| anyhow!("Invalid date: year={}, month=1, day=1", year + 1))?
+                        - chrono::Duration::days(1)
                 } else {
-                    NaiveDate::from_ymd_opt(year, month + 1, 1).unwrap() - chrono::Duration::days(1)
+                    NaiveDate::from_ymd_opt(year, month + 1, 1).ok_or_else(|| {
+                        anyhow!("Invalid date: year={}, month={}, day=1", year, month + 1)
+                    })? - chrono::Duration::days(1)
                 };
                 (start, end)
             }
             "year" => {
                 let year = base_date.year();
-                let start = NaiveDate::from_ymd_opt(year, 1, 1).unwrap();
-                let end = NaiveDate::from_ymd_opt(year, 12, 31).unwrap();
+                let start = NaiveDate::from_ymd_opt(year, 1, 1)
+                    .ok_or_else(|| anyhow!("Invalid date: year={}, month=1, day=1", year))?;
+                let end = NaiveDate::from_ymd_opt(year, 12, 31)
+                    .ok_or_else(|| anyhow!("Invalid date: year={}, month=12, day=31", year))?;
                 (start, end)
             }
             _ => (base_date, base_date),

@@ -1405,6 +1405,7 @@ dependencies = [
  "chrono",
  "clap",
  "imap",
+ "lazy_static",
  "mailparse",
  "native-tls",
  "regex",

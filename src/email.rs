@@ -2,12 +2,21 @@ use anyhow::{Result, anyhow};
 use base64::Engine;
 use chrono::{Local, NaiveDate};
 use imap;
+use lazy_static::lazy_static;
 use mailparse::*;
 use native_tls::TlsConnector;
 use regex::Regex;
 use std::env;
 
+use crate::config::{LEGACY_PASSWORD_ENV_VAR, PASSWORD_ENV_VAR, PASSWORD_PLACEHOLDER};
 use crate::models::Transaction;
+
+lazy_static! {
+    static ref HTML_TAG_REGEX: Regex =
+        Regex::new(r"<[^>]+>").expect("HTML tag regex should compile");
+    static ref WHITESPACE_REGEX: Regex =
+        Regex::new(r"(?m)^\s+|(?m)\s+$|\s{2,}").expect("Whitespace regex should compile");
+}
 
 pub struct EmailClient {
     server: String,
@@ -18,16 +27,25 @@ pub struct EmailClient {
 
 impl EmailClient {
     pub fn new(server: &str, port: u16, username: &str, password: &str) -> Result<Self> {
-        // Prefer the provided password; fall back to env if empty
-        let final_password = if password.trim().is_empty() {
-            env::var("EMAIL_APP_PASSWORD").unwrap_or_default()
+        // Prefer environment variables over config values for security.
+        let env_password = env::var(PASSWORD_ENV_VAR)
+            .or_else(|_| env::var(LEGACY_PASSWORD_ENV_VAR))
+            .unwrap_or_default();
+
+        let cfg_password = password.trim();
+        let final_password = if !env_password.trim().is_empty() {
+            env_password
+        } else if cfg_password.is_empty() || cfg_password == PASSWORD_PLACEHOLDER {
+            String::new()
         } else {
-            password.to_string()
+            cfg_password.to_string()
         };
 
         if final_password.is_empty() {
             return Err(anyhow!(
-                "Email password not provided in config and EMAIL_APP_PASSWORD environment variable not set"
+                "Email password missing. Set {} (preferred) or {} environment variable.",
+                PASSWORD_ENV_VAR,
+                LEGACY_PASSWORD_ENV_VAR
             ));
         }
 
@@ -310,7 +328,7 @@ pub fn parse_transaction_from_email(email_text: &str) -> Option<Transaction> {
                         amount = Some(parsed_amount);
 
                         // Determine currency based on pattern match
-                        let full_match = caps.get(0).unwrap().as_str().to_lowercase();
+                        let full_match = caps.get(0).map_or("", |m| m.as_str()).to_lowercase();
                         if full_match.contains("vnd") {
                             currency = "VND".to_string();
                         } else if full_match.contains("€") || full_match.contains("eur") {
@@ -755,11 +773,8 @@ fn convert_html_to_text(html: &str) -> String {
         .replace("&pound;", "£")
         .replace("&yen;", "¥");
 
-    let re = Regex::new(r"<[^>]+>").unwrap();
-    let text_only = re.replace_all(&with_newlines, "").to_string();
-
-    let re_spaces = Regex::new(r"(?m)^\s+|(?m)\s+$|\s{2,}").unwrap();
-    let cleaned = re_spaces.replace_all(&text_only, "").to_string();
+    let text_only = HTML_TAG_REGEX.replace_all(&with_newlines, "").to_string();
+    let cleaned = WHITESPACE_REGEX.replace_all(&text_only, "").to_string();
 
     cleaned
         .lines()

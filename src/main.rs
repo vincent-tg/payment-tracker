@@ -23,6 +23,10 @@ enum Commands {
         #[arg(short, long)]
         password: Option<String>,
 
+        /// Read email password from stdin (more secure than --password)
+        #[arg(long, default_value_t = false)]
+        password_stdin: bool,
+
         /// IMAP server
         #[arg(long)]
         imap_server: Option<String>,
@@ -117,17 +121,32 @@ async fn main() -> Result<()> {
         Commands::Config {
             email,
             password,
+            password_stdin,
             imap_server,
             imap_port,
             database,
         } => {
-            let mut config = Config::load().unwrap_or_default();
+            let mut config = match Config::load() {
+                Ok(cfg) => cfg,
+                Err(e) => {
+                    eprintln!("⚠️ Failed to load existing config: {e}. Using defaults.");
+                    Config::default()
+                }
+            };
 
             if let Some(email) = email {
                 config.email.address = email;
             }
 
-            if let Some(password) = password {
+            if password_stdin {
+                use std::io::{self, Read};
+                let mut buffer = String::new();
+                io::stdin().read_to_string(&mut buffer)?;
+                let stdin_password = buffer.trim().to_string();
+                if !stdin_password.is_empty() {
+                    config.email.password = stdin_password;
+                }
+            } else if let Some(password) = password {
                 config.email.password = password;
             }
 
