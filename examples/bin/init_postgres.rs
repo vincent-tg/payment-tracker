@@ -12,12 +12,12 @@ async fn main() -> anyhow::Result<()> {
     println!("Connecting to database...");
 
     // Initialize database
-    Database::init_database(connection_string).await?;
+    Database::init_database(&connection_string).await?;
 
     println!("✅ Database initialized successfully!");
 
     // Test connection
-    let db = Database::new(connection_string).await?;
+    let db = Database::new(&connection_string).await?;
     println!("✅ Database connection test passed!");
 
     // Create a test transaction
