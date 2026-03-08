@@ -98,16 +98,16 @@ impl Config {
             let content = fs::read_to_string(&config_path)?;
             let mut config: Config = toml::from_str(&content)?;
             config.apply_provider_settings();
-            // Override database connection string from environment if provided (Supabase)
-            if let Ok(supabase_url) = env::var("SUPABASE_CONNECTION_STRING") {
-                config.database.connection_string = Some(supabase_url);
+            // Override database connection string from environment if provided 
+            if let Ok(db_url) = env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING")) {
+                config.database.connection_string = Some(db_url);
             }
             Ok(config)
         } else {
             let mut config = Config::default();
             // Override with env var if present even for fresh config
-            if let Ok(supabase_url) = env::var("SUPABASE_CONNECTION_STRING") {
-                config.database.connection_string = Some(supabase_url);
+            if let Ok(db_url) = env::var("DATABASE_URL").or_else(|_| env::var("SUPABASE_CONNECTION_STRING")) {
+                config.database.connection_string = Some(db_url);
             }
             config.save()?;
             Ok(config)
@@ -130,12 +130,29 @@ impl Config {
 
     pub fn save(&self) -> Result<()> {
         let config_path = Self::config_path();
+        if let Some(parent) = Path::new(&config_path).parent() {
+            if !parent.exists() && parent != Path::new("") {
+                fs::create_dir_all(parent).unwrap_or_default();
+            }
+        }
         let content = toml::to_string_pretty(self)?;
         fs::write(config_path, content)?;
         Ok(())
     }
 
     fn config_path() -> String {
+        if Path::new("/app/config.toml").exists() {
+            return "/app/config.toml".to_string();
+        }
+        if Path::new("./config.toml").exists() {
+            return "./config.toml".to_string();
+        }
+        
+        // If there's an explicit /app directory but the file doesn't exist yet, we're likely in docker
+        if Path::new("/app").exists() {
+            return "/app/config.toml".to_string();
+        }
+
         let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
         format!("{}/.payment-tracker/config.toml", home)
     }
