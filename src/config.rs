@@ -6,11 +6,23 @@ use std::path::Path;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EmailConfig {
+    #[serde(default)]
     pub address: String,
+    #[serde(default)]
     pub password: String,
+    #[serde(default = "default_imap_server")]
     pub imap_server: String,
+    #[serde(default = "default_imap_port")]
     pub imap_port: u16,
     pub provider: Option<String>,
+}
+
+fn default_imap_server() -> String {
+    "imap.gmail.com".to_string()
+}
+
+fn default_imap_port() -> u16 {
+    993
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
