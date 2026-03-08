@@ -90,7 +90,7 @@ impl Database {
         );
 
         let result = sqlx::query(&query)
-            .bind(transaction.date.to_string())
+            .bind(transaction.date)
             .bind(&transaction.description)
             .bind(transaction.amount)
             .bind(&transaction.currency)
@@ -99,7 +99,7 @@ impl Database {
             .bind(&transaction.bank)
             .bind(transaction.transaction_id.as_deref())
             .bind(transaction.email_message_id.as_deref())
-            .bind(transaction.created_at.to_string())
+            .bind(transaction.created_at.naive_utc())
             .fetch_one(&self.pool)
             .await?;
 
@@ -152,7 +152,7 @@ impl Database {
             WHERE date = $1 AND description = $2 AND amount = $3 AND type = $4 AND currency = $5 AND bank = $6
             "#,
         )
-        .bind(transaction.date.to_string())
+        .bind(transaction.date)
         .bind(&transaction.description)
         .bind(transaction.amount)
         .bind(&transaction.r#type)
