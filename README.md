@@ -11,6 +11,7 @@ A production-ready Rust application for tracking payment cash in/out by parsing 
 - **Reporting**: Easily generate summaries and aggregate financial reports by period (day, week, month, year).
 - **Containerization**: Includes a lightweight, multi-stage Alpine Dockerfile.
 - **Kubernetes / CI-CD**: Fully orchestrated k3s kubernetes manifests and an automated GitHub Actions CI/CD Pipeline.
+- **Modern Dashboard**: Next.js 15 frontend with TypeScript, Tailwind, and shadcn/ui for visualizing transactions and managing finances.
 
 ## 📁 Repository Structure
 
@@ -24,6 +25,11 @@ payment-tracker/
 │   ├── email.rs            # IMAP parsing and Regex logic
 │   ├── models.rs           # Transaction & Summary Object models
 │   └── transactions.rs     # Transaction processing utilities
+├── frontend/               # Next.js 15 dashboard (TypeScript, Tailwind, shadcn/ui)
+│   ├── app/                # App router pages
+│   ├── components/         # React components
+│   ├── lib/                # Utilities and API client
+│   └── public/             # Static assets
 ├── k8s/                    # Kubernetes manifests (Deployments, PVCs, CronJobs)
 ├── .github/workflows/      # Automated CI/CD pipelines
 ├── Dockerfile              # Multi-stage Alpine container build
@@ -39,6 +45,7 @@ payment-tracker/
 
 - Rust and Cargo
 - SQLite or PostgreSQL
+- Node.js 18+ and npm (for frontend)
 - Docker (optional)
 
 ### Installation
@@ -80,6 +87,54 @@ payment-tracker fetch
 ```bash
 payment-tracker summary --period month
 payment-tracker list --limit 10
+```
+
+### Frontend Dashboard
+
+The project includes a modern Next.js 15 dashboard for visualizing transactions.
+
+**Local Development:**
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server (runs on port 3000):
+```bash
+npm run dev
+```
+
+4. Ensure the Rust backend is running on port 8080:
+```bash
+# In another terminal, from the project root:
+cargo run -- api
+# or
+./target/release/payment-tracker api
+```
+
+The frontend will proxy API requests to `http://localhost:8080` automatically.
+
+**Production Build:**
+
+To build the frontend as static files:
+```bash
+cd frontend
+npm run build
+```
+
+The built files will be in `frontend/out` and can be served by any static web server.
+
+**Docker:**
+
+A Dockerfile is provided to build a production image with nginx:
+```bash
+docker build -t payment-tracker-frontend frontend/
 ```
 
 ## 🟩 Supabase PostgreSQL Setup
@@ -127,6 +182,23 @@ livenessProbe:
     path: /health
     port: 8080
 ```
+
+### Frontend Deployment
+
+The frontend dashboard can be deployed alongside the backend using the provided `k8s/frontend-deployment.yaml` manifest.
+
+1. Build the frontend Docker image and push to your container registry:
+```bash
+docker build -t ghcr.io/vincent-tg/payment-tracker-frontend:latest frontend/
+docker push ghcr.io/vincent-tg/payment-tracker-frontend:latest
+```
+
+2. Apply the frontend manifest:
+```bash
+kubectl apply -f k8s/frontend-deployment.yaml -n default
+```
+
+The frontend service will be accessible via the Ingress host `payments.local` (configure as needed). The frontend proxies API requests to the backend service `payment-tracker:8080`.
 
 ## ⚙️ CI/CD Pipeline Architecture
 

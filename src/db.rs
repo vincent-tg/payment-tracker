@@ -63,31 +63,41 @@ impl Database {
 
     pub async fn insert_transaction(&self, transaction: &Transaction) -> Result<i64> {
         // Use transaction_id for upsert if available, otherwise use email_message_id
-        let conflict_target = if transaction.transaction_id.is_some() {
-            "(transaction_id, bank)"
+        let (conflict_target, do_update) = if transaction.transaction_id.is_some() {
+            ("(transaction_id, bank)", true)
         } else if transaction.email_message_id.is_some() {
-            "(email_message_id)"
+            ("(email_message_id)", true)
         } else {
-            // Fallback to composite key
-            "(date, description, amount, type, currency, bank)"
+            // No unique constraint for manual entries, just insert
+            ("", false)
         };
 
-        let query = format!(
-            r#"
-            INSERT INTO transactions (date, description, amount, currency, type, source, bank, transaction_id, email_message_id, created_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-            ON CONFLICT {conflict_target} 
-            DO UPDATE SET 
-                date = EXCLUDED.date,
-                description = EXCLUDED.description,
-                amount = EXCLUDED.amount,
-                currency = EXCLUDED.currency,
-                type = EXCLUDED.type,
-                source = EXCLUDED.source,
-                created_at = EXCLUDED.created_at
-            RETURNING id
-            "#
-        );
+        let query = if do_update {
+            format!(
+                r#"
+                INSERT INTO transactions (date, description, amount, currency, type, source, bank, transaction_id, email_message_id, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                ON CONFLICT {conflict_target} 
+                DO UPDATE SET 
+                    date = EXCLUDED.date,
+                    description = EXCLUDED.description,
+                    amount = EXCLUDED.amount,
+                    currency = EXCLUDED.currency,
+                    type = EXCLUDED.type,
+                    source = EXCLUDED.source,
+                    created_at = EXCLUDED.created_at
+                RETURNING id
+                "#
+            )
+        } else {
+            format!(
+                r#"
+                INSERT INTO transactions (date, description, amount, currency, type, source, bank, transaction_id, email_message_id, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                RETURNING id
+                "#
+            )
+        };
 
         let result = sqlx::query(&query)
             .bind(transaction.date)
@@ -103,8 +113,8 @@ impl Database {
             .fetch_one(&self.pool)
             .await?;
 
-        let id: i64 = result.get("id");
-        Ok(id)
+        let id: i32 = result.get("id");
+        Ok(id as i64)
     }
 
     pub async fn transaction_exists(&self, transaction: &Transaction) -> Result<bool> {
