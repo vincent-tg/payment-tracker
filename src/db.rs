@@ -11,7 +11,15 @@ pub struct Database {
 
 impl Database {
     pub async fn new(connection_string: &str) -> Result<Self> {
-        let pool = PgPoolOptions::new().connect(connection_string).await?;
+        let pool = PgPoolOptions::new()
+            .min_connections(0)
+            .max_connections(5)
+            .acquire_timeout(std::time::Duration::from_secs(10))
+            .idle_timeout(std::time::Duration::from_secs(60))
+            .max_lifetime(std::time::Duration::from_secs(300))
+            .test_before_acquire(true)
+            .connect(connection_string)
+            .await?;
 
         Ok(Self { pool })
     }
